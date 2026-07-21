@@ -40,13 +40,13 @@ export default function DashboardTab({
                 />
                 <defs>
                   <linearGradient id="progressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#2563EB" />
-                    <stop offset="100%" stopColor="#3B82F6" />
+                    <stop offset="0%" stopColor="#0B53FA" />
+                    <stop offset="100%" stopColor="#10B981" />
                   </linearGradient>
                 </defs>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-black text-[#2563EB] tracking-tighter">
+                <span className="text-3xl font-black text-[#0B53FA] tracking-tighter">
                   {dashboardMetrics?.score !== undefined ? dashboardMetrics.score : metrics?.score !== undefined ? metrics.score : 76}%
                 </span>
               </div>
@@ -243,16 +243,12 @@ export default function DashboardTab({
                   isReal: true
                 });
               });
-              const mocks = [
-                { id: 'mock-1', name: 'Paracetamol', dateText: 'Today, 08:30 AM', status: 'taken', isReal: false },
-                { id: 'mock-2', name: 'Para Hcl', dateText: 'Yesterday, 09:15 PM', status: 'missed', isReal: false },
-                { id: 'mock-3', name: 'Amoxicillin', dateText: 'Yesterday, 02:00 PM', status: 'taken', isReal: false }
-              ];
-              if (displayLogs.length < 3) {
-                const len = displayLogs.length;
-                for (let i = len; i < 3; i++) {
-                  displayLogs.push(mocks[i - len]);
-                }
+              if (displayLogs.length === 0) {
+                return (
+                  <div className="text-center py-6 text-slate-400 text-xs font-medium bg-slate-50/50 rounded-2xl border border-slate-100">
+                    No medication intake logs recorded yet.
+                  </div>
+                );
               }
 
               return displayLogs.slice(0, 4).map((log, idx) => (
@@ -278,18 +274,11 @@ export default function DashboardTab({
                     </span>
                     <button
                       onClick={async () => {
-                        if (log.isReal) {
-                          const userConfirmed = await confirm("Are you sure you want to delete this intake log?");
-                          if (userConfirmed) {
-                            const deleteAdherenceLogFn = async () => {
-                              const api = await import('../../services/dataService');
-                              await api.deleteAdherenceLog(log.id);
-                              loadData();
-                            };
-                            deleteAdherenceLogFn();
-                          }
-                        } else {
-                          alert("This is a demonstration/mock log matching the style of the target design.");
+                        const userConfirmed = await confirm("Are you sure you want to delete this intake log?");
+                        if (userConfirmed) {
+                          const api = await import('../../services/dataService');
+                          await api.deleteAdherenceLog(log.id);
+                          loadData();
                         }
                       }}
                       className="text-slate-300 hover:text-rose-500 p-1.5 transition-colors cursor-pointer"
@@ -305,14 +294,14 @@ export default function DashboardTab({
       </div>
 
       {/* DESKTOP DASHBOARD VIEW */}
-      <div className="hidden md:block space-y-6 pt-2">
+      <div className="hidden md:block space-y-6 pb-12">
         {/* Dashboard Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
+        <div className="bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left mb-6">
           <div>
             <h2 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight">Patient Analytics</h2>
             <p className="text-sm text-[#4B6B8B] font-medium mt-1">Real-time health insights and adherence monitoring.</p>
           </div>
-          <div className="flex items-center gap-3.5 bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)] p-2.5 pr-4 rounded-2xl select-none shrink-0">
+          <div className="flex items-center gap-3.5 bg-slate-50 border border-slate-100 p-2.5 pr-4 rounded-2xl select-none shrink-0">
             <div className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#0B53FA] to-[#10B981] flex items-center justify-center font-extrabold text-[15px] text-white shrink-0 shadow-sm">
               {user.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
             </div>
@@ -452,7 +441,7 @@ export default function DashboardTab({
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleLogDose(med._id || med.id, slot, 'taken')}
-                          className="px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[11px] font-bold rounded-lg transition-all active:scale-95 cursor-pointer"
+                          className="px-3 py-1.5 bg-[#0B53FA] hover:bg-[#0944CD] text-white text-[11px] font-bold rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm shadow-[#0B53FA]/10"
                         >
                           Take
                         </button>
@@ -623,18 +612,10 @@ export default function DashboardTab({
 
         {/* Bottom Section: Your Recent Intake History Table */}
         <div className="bg-white rounded-[2rem] border border-[#E2E8F0] shadow-[0_10px_30px_rgba(37,99,235,0.02)] p-6 text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2.5">
               <ClipboardList className="w-5 h-5 text-[#2563EB]" />
               <h3 className="text-base font-black text-[#0F2F57]">Your Recent Intake History</h3>
-            </div>
-            <div className="flex items-center gap-2.5 shrink-0">
-              <button onClick={() => setActiveTab('activity')} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold rounded-full text-[#64748B] flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.477 8 1.4M12 3v7h7M12 3v0M12 21c-2.755 0-5.455-.477-8-1.4M12 21v-7H4M12 21v0" /></svg> Filter
-              </button>
-              <button onClick={() => setActiveTab('activity')} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold rounded-full text-[#64748B] flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Export
-              </button>
             </div>
           </div>
 

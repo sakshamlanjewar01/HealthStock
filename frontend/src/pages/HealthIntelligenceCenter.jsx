@@ -133,7 +133,7 @@ export default function HealthIntelligenceCenter({ activeTab, setActiveTab }) {
                 />
               </Suspense>
             </ErrorBoundary>
-          ) : activeTab === 'activity' ? (
+          ) : (activeTab === 'activity' || activeTab === 'calendar') ? (
             <ErrorBoundary>
               <Suspense fallback={<div className="w-full h-64 bg-slate-100 rounded-3xl animate-pulse" />}>
                 <ActivityLog
@@ -143,33 +143,6 @@ export default function HealthIntelligenceCenter({ activeTab, setActiveTab }) {
                   metrics={dashboardMetrics || metrics}
                   onUpdate={loadData}
                   setActiveTab={setActiveTab}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          ) : activeTab === 'calendar' ? (
-            <ErrorBoundary>
-              <Suspense fallback={<div className="w-full h-64 bg-slate-100 rounded-3xl animate-pulse" />}>
-                <MedicationCalendar
-                  medicines={medicines}
-                  logs={logs}
-                  onLogAction={async (medId, timeOfDay, status, date) => {
-                    if (status === 'undo') {
-                      const log = logs.find(l => l.medicineId === medId && l.timeOfDay === timeOfDay && l.date === date);
-                      if (log) {
-                        await deleteAdherenceLog(log._id || log.id);
-                        loadData();
-                      }
-                    } else {
-                      await addAdherenceLog({
-                        medicineId: medId,
-                        date,
-                        timeOfDay,
-                        status,
-                        note: ''
-                      });
-                      loadData();
-                    }
-                  }}
                 />
               </Suspense>
             </ErrorBoundary>
@@ -251,7 +224,7 @@ export default function HealthIntelligenceCenter({ activeTab, setActiveTab }) {
                   }
                   value={loggingNote}
                   onChange={e => setLoggingNote(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#0F2F57]"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#0F2F57]"
                 />
               </div>
 
@@ -319,7 +292,7 @@ export default function HealthIntelligenceCenter({ activeTab, setActiveTab }) {
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-slate-955/40 backdrop-blur-sm animate-fadeIn">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setShowQuickLogModal(false)} />
 
-          <div className="bg-white p-6 rounded-t-3xl sm:rounded-3xl border border-slate-100 w-full sm:max-w-md relative z-10 max-h-[80vh] overflow-y-auto shadow-2xl animate-scaleUp text-left">
+          <div className="bg-white p-6 rounded-t-3xl sm:rounded-3xl border border-slate-100 w-full sm:max-w-md relative z-10 max-h-[80vh] overflow-y-auto no-scrollbar shadow-2xl animate-scaleUp text-left">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-[#0F2F57]">Log New Intake</h3>
               <button
@@ -551,7 +524,7 @@ export default function HealthIntelligenceCenter({ activeTab, setActiveTab }) {
                     type="text"
                     value={refillDosage}
                     onChange={e => setRefillDosage(e.target.value)}
-                    className="w-full text-2xl font-bold text-[#0f172a] focus:outline-none bg-transparent pr-2 placeholder-slate-300"
+                    className="w-full text-2xl font-bold text-[#0f172a] focus:outline-none bg-transparent pr-2 placeholder:text-slate-400"
                     placeholder="5mg"
                   />
                   <div className="w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center shrink-0">

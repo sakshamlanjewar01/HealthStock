@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { useConfirm } from '../context/ConfirmContext';
 import {
   Package, RefreshCw, AlertTriangle, Plus, Trash2, ShieldAlert, Phone,
-  Search, ArrowLeft, SlidersHorizontal, Bookmark, Edit, ClipboardCheck, Activity, Calendar, Clock, AlertCircle
+  Search, ArrowLeft, SlidersHorizontal, Bookmark, Edit, ClipboardCheck, Activity, Clock, AlertCircle, ChevronDown, X,
+  Pill, Sun, Sunset, Moon, Check, Save, FileText, User, Hash, Stethoscope, Mail, Shield, Calendar, Bell, CheckCircle2, PackageCheck
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
@@ -66,22 +67,6 @@ const renderScheduleDisplay = (timeOfDay, reminderTime) => {
 
 export default function InventoryManager({ medicines, refills, logs = [], onRefill, onDelete, onAddMedicine, onEditMedicine, setActiveTab, onRequestPharmacyRefill, recentRefillMedId }) {
   const confirm = useConfirm();
-  const downloadCalendar = async () => {
-    try {
-      const { API_URL } = await import('../config.js');
-      const res = await fetch(`${API_URL}/data/calendar/export`, { credentials: 'include' });
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'medication-schedule.ics';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (err) {
-      console.error('Failed to export calendar', err);
-    }
-  };
 
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -480,347 +465,374 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
   const complianceScore = totalLogs > 0 ? Math.round((takenLogs / totalLogs) * 100) : 76;
 
   return (
-    <div className="space-y-6 sm:space-y-8 mt-1 pb-20 relative z-20">
+    <div className="space-y-6 sm:space-y-8 pt-4 pb-12 relative z-20">
 
 
-      {/* 1. HEADER, SEARCH & FILTERS */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="text-left shrink-0 flex items-center justify-between w-full lg:w-auto">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F2F57] tracking-tight leading-tight">Medication Inventory</h2>
-            <p className="text-xs text-[#4B6B8B] font-medium mt-1">Manage and track your pharmaceutical supplies.</p>
-          </div>
+      {/* 1. SEPARATE TOP HEADING CARD */}
+      <div className="bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
+        <div>
+          <h2 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight">Medication Inventory</h2>
+          <p className="text-sm text-[#4B6B8B] font-medium mt-1">Manage and track your pharmaceutical supplies.</p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
           <button
-            onClick={downloadCalendar}
-            className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 border border-slate-100 text-slate-600 hover:text-[#0F2F57] hover:bg-slate-100 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0B53FA] hover:bg-[#0944CD] active:scale-95 text-white rounded-2xl text-xs font-extrabold transition-all cursor-pointer shadow-md shadow-[#0B53FA]/25"
           >
-            <Calendar className="w-4 h-4 text-[#0F2F57]/70" /> Sync Calendar
+            <Plus className="w-4 h-4 text-white" /> Add Medicine
           </button>
         </div>
+      </div>
 
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 w-full">
-          {/* Left: Filter Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-50 border border-slate-200 rounded-2xl self-start">
+      {/* 2. DEDICATED SEARCH & FILTER TOOLBAR (UNIFIED SINGLE ROW DOWNSIDE) */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 w-full">
+        {/* Search Bar (Left) */}
+        <div className="relative flex-1 min-w-[260px]">
+          <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none z-10">
+            <Search className="w-5 h-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            style={{ border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', paddingLeft: '64px', height: '56px' }}
+            className="block w-full pr-12 h-14 bg-white rounded-2xl text-sm font-bold text-[#0F2F57] placeholder:text-slate-400 placeholder:opacity-100 placeholder:font-normal focus:outline-none focus:ring-4 focus:ring-[#0B53FA]/10 transition-all border-none"
+            placeholder="Search medication..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Filter Controls Row (Right) */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {/* Filter Tabs */}
+          <div style={{ border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }} className="bg-white p-1.5 rounded-2xl flex items-center gap-1.5 select-none overflow-x-auto border-none">
             <button
               onClick={() => setActiveFilter('ALL')}
-              className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer ${activeFilter === 'ALL' ? 'bg-[#2563EB] text-white shadow-sm' : 'bg-transparent text-slate-700 hover:text-black'}`}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeFilter === 'ALL' ? 'bg-[#0B53FA] text-white shadow-md shadow-[#0B53FA]/25' : 'text-slate-600 hover:text-[#0F2F57] hover:bg-slate-50'
+                }`}
             >
               All Items
             </button>
             <button
               onClick={() => setActiveFilter('REFILLS')}
-              className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer ${activeFilter === 'REFILLS' ? 'bg-[#2563EB] text-white shadow-sm' : 'bg-transparent text-slate-700 hover:text-black'}`}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeFilter === 'REFILLS' ? 'bg-[#0B53FA] text-white shadow-md shadow-[#0B53FA]/25' : 'text-slate-600 hover:text-[#0F2F57] hover:bg-slate-50'
+                }`}
             >
               Refills needed
             </button>
             <button
               onClick={() => setActiveFilter('CHRONIC')}
-              className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer ${activeFilter === 'CHRONIC' ? 'bg-[#2563EB] text-white shadow-sm' : 'bg-transparent text-slate-700 hover:text-black'}`}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeFilter === 'CHRONIC' ? 'bg-[#0B53FA] text-white shadow-md shadow-[#0B53FA]/25' : 'text-slate-600 hover:text-[#0F2F57] hover:bg-slate-50'
+                }`}
             >
               Chronic Care
             </button>
           </div>
 
-          {/* Right: Actions and Search */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 lg:flex-1">
-            {/* SEARCH */}
-            <div className="relative flex-1 sm:max-w-xs flex items-center">
-              <div className="absolute left-3 z-10 pointer-events-none">
-                <Search className="h-4 w-4 text-slate-500" />
-              </div>
-              <input
-                type="text"
-                style={{ paddingLeft: '40px', paddingRight: '40px', paddingTop: '10px', paddingBottom: '10px', height: '42px', border: '2.5px solid #000000' }}
-                className="block w-full bg-white rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] font-bold"
-                placeholder="Search medication"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="absolute right-3 z-10 flex items-center text-slate-500 hover:text-[#0F2F57] cursor-pointer"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* ADD BUTTON */}
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="flex items-center justify-center gap-1.5 px-4.5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm shrink-0"
-            >
-              <Plus className="w-4 h-4 text-white" /> Add Medicine
-            </button>
-
-            {/* SYNC CALENDAR */}
-            <button
-              onClick={downloadCalendar}
-              className="hidden lg:flex items-center justify-center gap-1.5 px-4.5 py-2.5 bg-white border border-[#E2E8F0] hover:border-slate-300 text-[#2563EB] hover:text-[#1D4ED8] rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm shrink-0"
-            >
-              <Calendar className="w-4 h-4 text-[#2563EB]" /> Sync to Calendar
-            </button>
-          </div>
+          {/* Advanced Filters Button */}
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            style={{ border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}
+            className={`flex items-center gap-2.5 px-5 py-3.5 bg-white rounded-2xl text-xs font-bold transition-all cursor-pointer border-none ${showAdvancedFilters ? 'bg-slate-50 text-[#0B53FA] font-extrabold' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+          >
+            <SlidersHorizontal className="w-4.5 h-4.5 text-[#0B53FA]" />
+            <span>Filters</span>
+          </button>
         </div>
       </div>
 
-      {/* Advanced Filters Panel (Light Theme) */}
+      {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <div className="bg-white border border-slate-100 p-5 rounded-2xl space-y-4 animate-fadeIn text-left shadow-[0_8px_30px_rgb(0,0,0,0.02)] mt-2">
-          <h4 className="text-[10px] font-bold text-[#4B6B8B] uppercase tracking-widest border-b border-slate-100 pb-2 flex items-center gap-1.5">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#0F2F57]" /> Advanced Stock Filters
-          </h4>
+        <div className="bg-white border border-slate-200/80 p-4 sm:p-5 rounded-2xl space-y-4 animate-fadeIn text-left shadow-xs mt-3 overflow-hidden">
+          <div className="flex items-center justify-between bg-slate-50/80 border border-slate-200/80 rounded-xl px-4 py-2.5">
+            <h4 className="text-[10px] sm:text-xs font-bold text-[#0F2F57] uppercase tracking-wider flex items-center gap-2">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#0B53FA]" /> Advanced Stock Filters
+            </h4>
+            <button
+              onClick={() => { setFilterFood('All'); setFilterShape('All'); setFilterStockStatus('All'); setInventorySortBy('name'); }}
+              className="text-[#0B53FA] hover:text-[#0944CD] font-bold tracking-wider uppercase text-[10px] sm:text-xs cursor-pointer transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            {/* Food Intake */}
             <div className="space-y-1">
-              <label className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Food Intake</label>
-              <select value={filterFood} onChange={e => setFilterFood(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-605 px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-[#0F2F57] cursor-pointer">
-                <option value="All">All</option>
-                <option value="None">None</option>
-                <option value="Before Food">Before Food</option>
-                <option value="With Food">With Food</option>
-                <option value="After Food">After Food</option>
-                <option value="Empty Stomach">Empty Stomach</option>
-              </select>
+              <label className="text-[10px] uppercase font-black text-[#0F2F57] tracking-wider block">FOOD INTAKE</label>
+              <div className="relative flex items-center">
+                <select value={filterFood} onChange={e => setFilterFood(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
+                  <option value="All">All Intake Types</option>
+                  <option value="None">None</option>
+                  <option value="Before Food">Before Food</option>
+                  <option value="With Food">With Food</option>
+                  <option value="After Food">After Food</option>
+                  <option value="Empty Stomach">Empty Stomach</option>
+                </select>
+                <div className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-[#0F2F57] shadow-sm">
+                  <span>{filterFood === 'All' ? 'All Intake Types' : filterFood}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#0F2F57] shrink-0" />
+                </div>
+              </div>
             </div>
+
+            {/* Pill Shape */}
             <div className="space-y-1">
-              <label className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Pill Shape</label>
-              <select value={filterShape} onChange={e => setFilterShape(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-605 px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-[#0F2F57] cursor-pointer">
-                <option value="All">All Shapes</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Capsule">Capsule</option>
-                <option value="Liquid">Liquid Bottle</option>
-                <option value="Drops">Drops</option>
-              </select>
+              <label className="text-[10px] uppercase font-black text-[#0F2F57] tracking-wider block">PILL SHAPE</label>
+              <div className="relative flex items-center">
+                <select value={filterShape} onChange={e => setFilterShape(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
+                  <option value="All">All Shapes</option>
+                  <option value="Tablet">Tablet</option>
+                  <option value="Capsule">Capsule</option>
+                  <option value="Liquid">Liquid Bottle</option>
+                  <option value="Drops">Drops</option>
+                </select>
+                <div className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-[#0F2F57] shadow-sm">
+                  <span>{filterShape === 'All' ? 'All Shapes' : filterShape}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#0F2F57] shrink-0" />
+                </div>
+              </div>
             </div>
+
+            {/* Stock Status */}
             <div className="space-y-1">
-              <label className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Stock Status</label>
-              <select value={filterStockStatus} onChange={e => setFilterStockStatus(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-605 px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-[#0F2F57] cursor-pointer">
-                <option value="All">All Levels</option>
-                <option value="Low/Out">Low / Out of Stock</option>
-                <option value="Healthy">Healthy Stock</option>
-              </select>
+              <label className="text-[10px] uppercase font-black text-[#0F2F57] tracking-wider block">STOCK STATUS</label>
+              <div className="relative flex items-center">
+                <select value={filterStockStatus} onChange={e => setFilterStockStatus(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
+                  <option value="All">All Levels</option>
+                  <option value="Low/Out">Low / Out of Stock</option>
+                  <option value="Healthy">Healthy Stock</option>
+                </select>
+                <div className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-[#0F2F57] shadow-sm">
+                  <span>{filterStockStatus === 'All' ? 'All Levels' : filterStockStatus === 'Low/Out' ? 'Low / Out of Stock' : 'Healthy Stock'}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#0F2F57] shrink-0" />
+                </div>
+              </div>
             </div>
+
+            {/* Sort */}
             <div className="space-y-1">
-              <label className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Sort</label>
-              <select value={inventorySortBy} onChange={e => setInventorySortBy(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-605 px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-[#0F2F57] cursor-pointer">
-                <option value="name">Name (A-Z)</option>
-                <option value="stockLowToHigh">Stock (Low to High)</option>
-                <option value="capacityHighToLow">Capacity (High to Low)</option>
-              </select>
+              <label className="text-[10px] uppercase font-black text-[#0F2F57] tracking-wider block">SORT BY</label>
+              <div className="relative flex items-center">
+                <select value={inventorySortBy} onChange={e => setInventorySortBy(e.target.value)} className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
+                  <option value="name">Name (A-Z)</option>
+                  <option value="stockLowToHigh">Stock (Low to High)</option>
+                  <option value="capacityHighToLow">Capacity (High to Low)</option>
+                </select>
+                <div className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-extrabold text-[#0F2F57] shadow-sm">
+                  <span>{inventorySortBy === 'name' ? 'Name (A-Z)' : inventorySortBy === 'stockLowToHigh' ? 'Stock (Low to High)' : 'Capacity (High to Low)'}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#0F2F57] shrink-0" />
+                </div>
+              </div>
             </div>
           </div>
-          {(filterFood !== 'All' || filterShape !== 'All' || filterStockStatus !== 'All' || inventorySortBy !== 'name') && (
-            <div className="flex justify-end pt-1">
-              <button onClick={() => { setFilterFood('All'); setFilterShape('All'); setFilterStockStatus('All'); setInventorySortBy('name'); }} className="text-[#0F2F57] hover:underline font-bold tracking-wider uppercase text-[10px] cursor-pointer">
-                Reset Filters
-              </button>
-            </div>
-          )}
         </div>
       )}
 
       {/* 2. ADD/EDIT MEDICATION MODAL DIALOG (Redesigned to match image) */}
       {(showAddForm || editingMedicine) && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4 bg-black/30 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/40 backdrop-blur-md transition-all duration-300 animate-fadeIn"
           onClick={handleCancelForm}
         >
           <div
-            className="w-full sm:max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-zoomIn"
+            className="w-full sm:max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[95vh] sm:max-h-[88vh] flex flex-col overflow-hidden border border-slate-100 animate-slideUp sm:animate-zoomIn"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Mobile drag handle */}
             <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mt-3 mb-1" />
 
             {/* ── HEADER ── */}
-            <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white sticky top-0 z-20 shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center shrink-0">
-                  <span className="text-2xl">💊</span>
+                <div className="w-10 h-10 rounded-2xl bg-[#0B53FA]/10 text-[#0B53FA] flex items-center justify-center shrink-0 shadow-xs">
+                  <Pill className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-extrabold text-[#1a1f36] leading-tight">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
                     {editingMedicine ? 'Edit Medication' : 'Add New Medication'}
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Add medication details, schedule and inventory information</p>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">Fill in medication schedule, dosage, and stock details</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleCancelForm}
-                className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer w-8 h-8 rounded-full flex items-center justify-center text-base mt-1"
+                className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer w-8 h-8 rounded-full flex items-center justify-center shrink-0"
               >
-                ✕
+                <X className="w-4.5 h-4.5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5 overflow-y-auto flex-1 no-scrollbar">
 
               {/* ── SECTION 1: GENERAL DETAILS ── */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#3B5BDB] text-base">👤</span>
-                  <h3 className="text-sm font-bold text-[#3B5BDB]">General Details</h3>
+              <div className="bg-slate-50/50 border border-slate-200/80 rounded-2xl p-4.5 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-blue-100/70 text-[#0B53FA] flex items-center justify-center shrink-0">
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">General Information</h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Medicine Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-600">Medicine Name <span className="text-rose-500">*</span></label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">📎</span>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800">Medicine Name <span className="text-rose-500">*</span></label>
+                    <div className="relative flex items-center">
+                      <Package className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                       <input
                         type="text"
                         required
                         placeholder="e.g. Metoprolol"
                         value={newName}
                         onChange={e => setNewName(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#3B5BDB] focus:ring-1 focus:ring-[#3B5BDB]/20 transition-all"
+                        style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0', paddingLeft: '48px' }}
+                        className="general-field-border w-full bg-white rounded-xl pl-12 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 font-bold placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none focus:border-[#0B53FA] focus:ring-2 focus:ring-[#0B53FA]/10 transition-all shadow-xs"
                       />
                     </div>
                   </div>
 
                   {/* Dosage Strength */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-600">Dosage Strength</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🛡️</span>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800">Dosage Strength</label>
+                    <div className="relative flex items-center">
+                      <Activity className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                       <input
                         type="text"
                         placeholder="e.g. 50mg, 100mcg"
                         value={newDosageStrength}
                         onChange={e => setNewDosageStrength(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#3B5BDB] focus:ring-1 focus:ring-[#3B5BDB]/20 transition-all"
+                        style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0', paddingLeft: '48px' }}
+                        className="general-field-border w-full bg-white rounded-xl pl-12 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 font-bold placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none focus:border-[#0B53FA] focus:ring-2 focus:ring-[#0B53FA]/10 transition-all shadow-xs"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Unit Type */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600">Unit Type <span className="text-rose-500">*</span></label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">📋</span>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-800">Unit Type <span className="text-rose-500">*</span></label>
+                  <div className="relative flex items-center">
+                    <ClipboardCheck className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                     <select
                       value={newUnit}
                       onChange={e => setNewUnit(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-[#3B5BDB] focus:ring-1 focus:ring-[#3B5BDB]/20 transition-all cursor-pointer appearance-none"
+                      style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0', paddingLeft: '48px' }}
+                      className="general-field-border w-full bg-white rounded-xl pl-12 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-[#0B53FA] focus:ring-2 focus:ring-[#0B53FA]/10 transition-all cursor-pointer shadow-xs"
                     >
                       <option value="Tablets">Tablets</option>
                       <option value="Capsules">Capsules</option>
                       <option value="ml">ml (Syrup)</option>
                       <option value="Drops">Drops</option>
                     </select>
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">▾</span>
                   </div>
                 </div>
               </div>
 
               {/* ── SECTION 2: DOSING & SCHEDULE ── */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#3B5BDB] text-base">📅</span>
-                  <h3 className="text-sm font-bold text-[#3B5BDB]">Dosing &amp; Schedule</h3>
+              <div className="bg-slate-50/50 border border-slate-200/80 rounded-2xl p-4.5 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-amber-100/70 text-amber-600 flex items-center justify-center shrink-0">
+                    <Calendar className="w-3.5 h-3.5" />
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">Dosing &amp; Schedule</h3>
                 </div>
 
                 {/* Time of Day Card Toggles */}
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-500">Time of Day (Select all that apply)</label>
+                  <label className="text-xs font-bold text-slate-800 block">Time of Day (Select all that apply)</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {/* Morning */}
                     <button
                       type="button"
                       onClick={() => setMorningChecked(!morningChecked)}
-                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${
-                        morningChecked
-                          ? 'border-[#3B5BDB] bg-indigo-50/70'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${morningChecked
+                          ? 'border-[#0B53FA] bg-white shadow-md shadow-[#0B53FA]/10 ring-2 ring-[#0B53FA]/20'
+                          : 'border-slate-300 bg-white hover:border-slate-400'
+                        }`}
                     >
                       {morningChecked && (
-                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#3B5BDB] rounded-full flex items-center justify-center">
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1.5 5l2.5 2.5 4.5-4.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-[#0B53FA] rounded-full flex items-center justify-center shadow-xs">
+                          <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
                         </span>
                       )}
-                      <span className="text-xl">☀️</span>
-                      <span className={`text-xs font-semibold ${ morningChecked ? 'text-[#3B5BDB]' : 'text-slate-600' }`}>Morning</span>
+                      <Sun className={`w-5 h-5 transition-colors ${morningChecked ? 'text-amber-500' : 'text-slate-700'}`} />
+                      <span className={`text-xs font-bold ${morningChecked ? 'text-[#0B53FA]' : 'text-slate-900'}`}>Morning</span>
                     </button>
 
                     {/* Afternoon */}
                     <button
                       type="button"
                       onClick={() => setAfternoonChecked(!afternoonChecked)}
-                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${
-                        afternoonChecked
-                          ? 'border-[#3B5BDB] bg-indigo-50/70'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${afternoonChecked
+                          ? 'border-[#0B53FA] bg-white shadow-md shadow-[#0B53FA]/10 ring-2 ring-[#0B53FA]/20'
+                          : 'border-slate-300 bg-white hover:border-slate-400'
+                        }`}
                     >
                       {afternoonChecked && (
-                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#3B5BDB] rounded-full flex items-center justify-center">
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1.5 5l2.5 2.5 4.5-4.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-[#0B53FA] rounded-full flex items-center justify-center shadow-xs">
+                          <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
                         </span>
                       )}
-                      <span className="text-xl">⛅</span>
-                      <span className={`text-xs font-semibold ${ afternoonChecked ? 'text-[#3B5BDB]' : 'text-slate-600' }`}>Afternoon</span>
+                      <Sun className={`w-5 h-5 transition-colors ${afternoonChecked ? 'text-orange-500' : 'text-slate-700'}`} />
+                      <span className={`text-xs font-bold ${afternoonChecked ? 'text-[#0B53FA]' : 'text-slate-900'}`}>Afternoon</span>
                     </button>
 
                     {/* Evening */}
                     <button
                       type="button"
                       onClick={() => setEveningChecked(!eveningChecked)}
-                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${
-                        eveningChecked
-                          ? 'border-[#3B5BDB] bg-indigo-50/70'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${eveningChecked
+                          ? 'border-[#0B53FA] bg-white shadow-md shadow-[#0B53FA]/10 ring-2 ring-[#0B53FA]/20'
+                          : 'border-slate-300 bg-white hover:border-slate-400'
+                        }`}
                     >
                       {eveningChecked && (
-                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#3B5BDB] rounded-full flex items-center justify-center">
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1.5 5l2.5 2.5 4.5-4.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-[#0B53FA] rounded-full flex items-center justify-center shadow-xs">
+                          <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
                         </span>
                       )}
-                      <span className="text-xl">🌅</span>
-                      <span className={`text-xs font-semibold ${ eveningChecked ? 'text-[#3B5BDB]' : 'text-slate-600' }`}>Evening</span>
+                      <Sunset className={`w-5 h-5 transition-colors ${eveningChecked ? 'text-indigo-600' : 'text-slate-700'}`} />
+                      <span className={`text-xs font-bold ${eveningChecked ? 'text-[#0B53FA]' : 'text-slate-900'}`}>Evening</span>
                     </button>
 
                     {/* Night */}
                     <button
                       type="button"
                       onClick={() => setNightChecked(!nightChecked)}
-                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${
-                        nightChecked
-                          ? 'border-[#3B5BDB] bg-indigo-50/70'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                      className={`relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl border-2 transition-all cursor-pointer select-none ${nightChecked
+                          ? 'border-[#0B53FA] bg-white shadow-md shadow-[#0B53FA]/10 ring-2 ring-[#0B53FA]/20'
+                          : 'border-slate-300 bg-white hover:border-slate-400'
+                        }`}
                     >
                       {nightChecked && (
-                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#3B5BDB] rounded-full flex items-center justify-center">
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1.5 5l2.5 2.5 4.5-4.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-[#0B53FA] rounded-full flex items-center justify-center shadow-xs">
+                          <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
                         </span>
                       )}
-                      <span className="text-xl">🌙</span>
-                      <span className={`text-xs font-semibold ${ nightChecked ? 'text-[#3B5BDB]' : 'text-slate-600' }`}>Night</span>
+                      <Moon className={`w-5 h-5 transition-colors ${nightChecked ? 'text-blue-600' : 'text-slate-700'}`} />
+                      <span className={`text-xs font-bold ${nightChecked ? 'text-[#0B53FA]' : 'text-slate-900'}`}>Night</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Custom Time Slot */}
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-slate-600 font-medium cursor-pointer select-none w-fit">
+                <div className="flex flex-col gap-2 pt-1">
+                  <label className="flex items-center gap-2 text-xs text-slate-900 font-bold cursor-pointer select-none w-fit">
                     <input
                       type="checkbox"
                       checked={customTimeChecked}
                       onChange={e => setCustomTimeChecked(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 accent-[#3B5BDB] cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 accent-[#0B53FA] cursor-pointer"
                     />
                     Custom Time Slot
                   </label>
@@ -830,20 +842,21 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                       placeholder="e.g. Bedtime, As Needed, With Lunch"
                       value={customTimeText}
                       onChange={e => setCustomTimeText(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#3B5BDB] focus:ring-1 focus:ring-[#3B5BDB]/20 transition-all"
+                      style={{ border: '1.5px solid #CBD5E1' }}
+                      className="w-full bg-white rounded-xl px-4 py-2.5 text-sm text-slate-900 font-medium placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none focus:border-[#0B53FA] focus:ring-2 focus:ring-[#0B53FA]/10 transition-all shadow-xs"
                     />
                   )}
                 </div>
 
                 {/* Alarm Time */}
-                <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 space-y-3 shadow-xs">
                   {checkedSlotsCount > 1 && (
-                    <label className="flex items-center gap-2 text-xs text-slate-500 font-semibold cursor-pointer select-none">
+                    <label className="flex items-center gap-2 text-xs text-slate-800 font-bold cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={useSeparateAlarms}
                         onChange={e => setUseSeparateAlarms(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 accent-[#3B5BDB] cursor-pointer"
+                        className="w-4 h-4 rounded border-slate-300 accent-[#0B53FA] cursor-pointer"
                       />
                       Configure separate alarm times for each slot
                     </label>
@@ -853,46 +866,47 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {morningChecked && (
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500">Morning Alarm Time</label>
-                          <input type="time" required value={slotTimes.Morning} onChange={e => setSlotTimes(prev => ({ ...prev, Morning: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-[#3B5BDB] cursor-pointer" />
+                          <label className="text-[11px] font-bold text-slate-800">Morning Alarm Time</label>
+                          <input type="time" required value={slotTimes.Morning} onChange={e => setSlotTimes(prev => ({ ...prev, Morning: e.target.value }))} style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0' }} className="general-field-border w-full bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none cursor-pointer" />
                         </div>
                       )}
                       {afternoonChecked && (
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500">Afternoon Alarm Time</label>
-                          <input type="time" required value={slotTimes.Afternoon} onChange={e => setSlotTimes(prev => ({ ...prev, Afternoon: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-[#3B5BDB] cursor-pointer" />
+                          <label className="text-[11px] font-bold text-slate-800">Afternoon Alarm Time</label>
+                          <input type="time" required value={slotTimes.Afternoon} onChange={e => setSlotTimes(prev => ({ ...prev, Afternoon: e.target.value }))} style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0' }} className="general-field-border w-full bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none cursor-pointer" />
                         </div>
                       )}
                       {eveningChecked && (
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500">Evening Alarm Time</label>
-                          <input type="time" required value={slotTimes.Evening} onChange={e => setSlotTimes(prev => ({ ...prev, Evening: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-[#3B5BDB] cursor-pointer" />
+                          <label className="text-[11px] font-bold text-slate-800">Evening Alarm Time</label>
+                          <input type="time" required value={slotTimes.Evening} onChange={e => setSlotTimes(prev => ({ ...prev, Evening: e.target.value }))} style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0' }} className="general-field-border w-full bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none cursor-pointer" />
                         </div>
                       )}
                       {nightChecked && (
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500">Night Alarm Time</label>
-                          <input type="time" required value={slotTimes.Night} onChange={e => setSlotTimes(prev => ({ ...prev, Night: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-[#3B5BDB] cursor-pointer" />
+                          <label className="text-[11px] font-bold text-slate-800">Night Alarm Time</label>
+                          <input type="time" required value={slotTimes.Night} onChange={e => setSlotTimes(prev => ({ ...prev, Night: e.target.value }))} style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0' }} className="general-field-border w-full bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none cursor-pointer" />
                         </div>
                       )}
                       {customTimeChecked && (
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500">"{customTimeText || 'Custom'}" Alarm Time</label>
-                          <input type="time" required value={slotTimes.Custom} onChange={e => setSlotTimes(prev => ({ ...prev, Custom: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-[#3B5BDB] cursor-pointer" />
+                          <label className="text-[11px] font-bold text-slate-800">"{customTimeText || 'Custom'}" Alarm Time</label>
+                          <input type="time" required value={slotTimes.Custom} onChange={e => setSlotTimes(prev => ({ ...prev, Custom: e.target.value }))} style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0' }} className="general-field-border w-full bg-white rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none cursor-pointer" />
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-600">Reminder Alarm Time</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🕐</span>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-800">Reminder Alarm Time</label>
+                      <div className="relative flex items-center">
+                        <Clock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                         <input
                           type="time"
                           required
                           value={singleAlarmTime}
                           onChange={e => setSingleAlarmTime(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-[#3B5BDB] focus:ring-1 focus:ring-[#3B5BDB]/20 cursor-pointer transition-all"
+                          style={{ border: '1px solid #E2E8F0', boxShadow: '0 0 0 1px #E2E8F0', paddingLeft: '48px' }}
+                          className="general-field-border w-full bg-white rounded-xl pl-12 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-[#0B53FA] focus:ring-2 focus:ring-[#0B53FA]/10 cursor-pointer transition-all shadow-xs"
                         />
                       </div>
                     </div>
@@ -901,73 +915,75 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
               </div>
 
               {/* ── SECTION 3: INVENTORY QUANTITIES ── */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#3B5BDB] text-base">📦</span>
-                  <h3 className="text-sm font-bold text-[#3B5BDB]">Inventory Quantities</h3>
+              <div className="bg-slate-50/50 border border-slate-200/80 rounded-2xl p-4.5 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center shrink-0">
+                    <PackageCheck className="w-3.5 h-3.5" />
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">Inventory Quantities</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Total Capacity */}
-                  <div className="border border-slate-200 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
-                      <span className="text-base">📦</span>
+                  <div style={{ border: '1.5px solid #CBD5E1' }} className="bg-white rounded-xl p-3.5 flex items-center gap-3 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                      <Package className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Total Capacity Quantity</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Total Capacity</label>
                       <input
                         type="number" min="1" placeholder="e.g. 30"
                         value={newTotalQty}
                         onChange={e => setNewTotalQty(e.target.value)}
-                        className="w-full text-sm font-semibold text-slate-600 placeholder-slate-300 focus:outline-none bg-transparent"
+                        className="w-full text-sm font-bold text-slate-800 placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none bg-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Current Stock */}
-                  <div className="border border-slate-200 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                      <span className="text-base">🟩</span>
+                  <div style={{ border: '1.5px solid #CBD5E1' }} className="bg-white rounded-xl p-3.5 flex items-center gap-3 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Current Stock Quantity</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Current Stock</label>
                       <input
                         type="number" min="0" placeholder="e.g. 30"
                         value={newCurrentQty}
                         onChange={e => setNewCurrentQty(e.target.value)}
-                        className="w-full text-sm font-semibold text-slate-600 placeholder-slate-300 focus:outline-none bg-transparent"
+                        className="w-full text-sm font-bold text-slate-800 placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none bg-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Refills Remaining */}
-                  <div className="border border-slate-200 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-sky-50 flex items-center justify-center shrink-0">
-                      <span className="text-base">🔄</span>
+                  <div style={{ border: '1.5px solid #CBD5E1' }} className="bg-white rounded-xl p-3.5 flex items-center gap-3 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                      <RefreshCw className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Refills Remaining</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Refills Remaining</label>
                       <input
                         type="number" min="0"
                         value={newRefillsRemaining}
                         onChange={e => setNewRefillsRemaining(e.target.value)}
-                        className="w-full text-sm font-bold text-slate-700 focus:outline-none bg-transparent"
+                        className="w-full text-sm font-bold text-slate-800 focus:outline-none bg-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Refill Alert Threshold */}
-                  <div className="border border-slate-200 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-                      <span className="text-base">🔔</span>
+                  <div style={{ border: '1.5px solid #CBD5E1' }} className="bg-white rounded-xl p-3.5 flex items-center gap-3 shadow-xs">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                      <Bell className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Refill Alert Threshold</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Refill Alert Threshold</label>
                       <input
                         type="number" min="0"
                         value={newRefillThreshold}
                         onChange={e => setNewRefillThreshold(e.target.value)}
-                        className="w-full text-sm font-bold text-slate-700 focus:outline-none bg-transparent"
+                        className="w-full text-sm font-bold text-slate-800 focus:outline-none bg-transparent"
                       />
                     </div>
                   </div>
@@ -975,27 +991,29 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
               </div>
 
               {/* ── SECTION 4: ADVANCED DETAILS ACCORDION ── */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden">
+              <div className="bg-slate-50/50 border border-slate-200/80 rounded-2xl overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setShowAdvancedDetails(!showAdvancedDetails)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer select-none hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-3.5 text-left cursor-pointer select-none hover:bg-slate-100/50 transition-colors"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#3B5BDB] text-base">🛡️</span>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-purple-100/70 text-purple-600 flex items-center justify-center shrink-0">
+                      <SlidersHorizontal className="w-3.5 h-3.5" />
+                    </div>
                     <div>
-                      <span className="text-sm font-bold text-[#3B5BDB]">Advanced Details</span>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Pill shape/color, Pharmacy, Rx details and more</p>
+                      <span className="text-xs sm:text-sm font-bold text-slate-900">Additional Details</span>
+                      <p className="text-[10px] text-slate-500 font-medium">Pill shape, Rx details, and Pharmacy contact</p>
                     </div>
                   </div>
-                  <span className="text-slate-400 text-xs">{showAdvancedDetails ? '▲' : '▼'}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${showAdvancedDetails ? 'rotate-180' : ''}`} />
                 </button>
 
                 {showAdvancedDetails && (
-                  <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4 animate-fadeIn">
+                  <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-3.5 border-t border-slate-200/60 pt-4 animate-fadeIn bg-white">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pill Shape</label>
-                      <select value={newPillShape} onChange={e => setNewPillShape(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none focus:bg-white focus:border-[#3B5BDB] cursor-pointer transition-all">
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Pill Shape</label>
+                      <select value={newPillShape} onChange={e => setNewPillShape(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer shadow-xs">
                         <option value="Tablet">Tablet</option>
                         <option value="Capsule">Capsule</option>
                         <option value="Liquid">Liquid Bottle</option>
@@ -1003,8 +1021,8 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pill Color</label>
-                      <select value={newPillColor} onChange={e => setNewPillColor(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none focus:bg-white focus:border-[#3B5BDB] cursor-pointer transition-all">
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Pill Color</label>
+                      <select value={newPillColor} onChange={e => setNewPillColor(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer shadow-xs">
                         <option value="White">White</option>
                         <option value="Red">Red</option>
                         <option value="Blue">Blue</option>
@@ -1016,47 +1034,47 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Purpose / Indication</label>
-                      <input type="text" placeholder="e.g. Blood pressure, Diabetes" value={newPurpose} onChange={e => setNewPurpose(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Purpose / Indication</label>
+                      <input type="text" placeholder="e.g. Blood pressure, Diabetes" value={newPurpose} onChange={e => setNewPurpose(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Prescribed Doctor</label>
-                      <input type="text" placeholder="e.g. Dr. Jameson" value={newPrescribedDoctor} onChange={e => setNewPrescribedDoctor(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Prescribed Doctor</label>
+                      <input type="text" placeholder="e.g. Dr. Jameson" value={newPrescribedDoctor} onChange={e => setNewPrescribedDoctor(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rx / Prescription Number</label>
-                      <input type="text" placeholder="e.g. RX-982741" value={newRxNumber} onChange={e => setNewRxNumber(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Rx / Prescription Number</label>
+                      <input type="text" placeholder="e.g. RX-982741" value={newRxNumber} onChange={e => setNewRxNumber(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Special Instructions</label>
-                      <input type="text" placeholder="e.g. Do not crush, take with food" value={newSpecialInstructions} onChange={e => setNewSpecialInstructions(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Special Instructions</label>
+                      <input type="text" placeholder="e.g. Do not crush, take with food" value={newSpecialInstructions} onChange={e => setNewSpecialInstructions(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pharmacy Phone Number</label>
-                      <input type="text" placeholder="e.g. (555) 019-2834" value={newPharmacyPhone} onChange={e => setNewPharmacyPhone(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Pharmacy Phone Number</label>
+                      <input type="text" placeholder="e.g. (555) 019-2834" value={newPharmacyPhone} onChange={e => setNewPharmacyPhone(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pharmacy Email Address</label>
-                      <input type="email" placeholder="e.g. restock@pharmacy.com" value={newPharmacyEmail} onChange={e => setNewPharmacyEmail(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#3B5BDB] transition-all" />
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Pharmacy Email Address</label>
+                      <input type="email" placeholder="e.g. restock@pharmacy.com" value={newPharmacyEmail} onChange={e => setNewPharmacyEmail(e.target.value)} style={{ border: '1px solid #E2E8F0' }} className="additional-details-black-border w-full bg-white rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder:font-normal placeholder:text-xs placeholder:text-slate-500 placeholder:opacity-100 focus:outline-none shadow-xs" />
                     </div>
                   </div>
                 )}
               </div>
 
               {/* ── FOOTER BUTTONS ── */}
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100 bg-white sticky bottom-0 z-10 pb-1">
                 <button
                   type="button"
                   onClick={handleCancelForm}
-                  className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer"
+                  className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer shadow-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5BDB] hover:bg-[#3451c7] text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-[#3B5BDB]/25 cursor-pointer"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#0B53FA] hover:bg-[#0944CD] active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md shadow-[#0B53FA]/25 cursor-pointer"
                 >
-                  <span>💾</span>
+                  <Save className="w-4 h-4 text-white" />
                   {editingMedicine ? 'Save Changes' : 'Save Medication'}
                 </button>
               </div>
@@ -1127,11 +1145,10 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                         <div className="flex gap-1.5">
                           <button
                             onClick={() => onRequestPharmacyRefill && onRequestPharmacyRefill(med)}
-                            className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
-                              recentRefillMedId === mId
+                            className={`p-1.5 rounded-xl border transition-all cursor-pointer ${recentRefillMedId === mId
                                 ? 'bg-emerald-100 border-emerald-300 text-emerald-600 animate-pulse scale-110 shadow-sm shadow-emerald-200'
                                 : 'bg-white hover:bg-slate-50 text-[#0F2F57] border-slate-150'
-                            }`}
+                              }`}
                             title="Request Pharmacy Refill"
                           >
                             <RefreshCw className={`w-3.5 h-3.5 ${recentRefillMedId === mId ? 'animate-spin' : ''}`} style={recentRefillMedId === mId ? { animationDuration: '2s' } : undefined} />
@@ -1169,7 +1186,7 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                         <div className={`h-full rounded-full transition-all duration-700 ${status.label === 'Healthy Stock' ? 'bg-emerald-500' :
-                            status.label === 'Low Stock' ? 'bg-amber-500' : 'bg-rose-500'
+                          status.label === 'Low Stock' ? 'bg-amber-500' : 'bg-rose-500'
                           }`} style={{ width: `${Math.min(100, (med.currentQuantity / med.totalQuantity) * 100)}%` }} />
                       </div>
 
@@ -1178,7 +1195,7 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                         {(() => {
                           const dailyDoses = med.dosesPerDay || 1;
                           const remainingDays = dailyDoses > 0 ? Math.floor(med.currentQuantity / dailyDoses) : 0;
-                          
+
                           if (med.currentQuantity <= 0) {
                             return (
                               <span className="text-rose-500 flex items-center gap-1 select-none">
@@ -1190,9 +1207,9 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                           const targetDate = new Date();
                           targetDate.setDate(targetDate.getDate() + remainingDays);
                           const forecastStr = targetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                          
+
                           const colorClass = remainingDays <= 5 ? 'text-rose-500 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg' : 'text-[#2563EB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-lg';
-                          
+
                           return (
                             <span className={`${colorClass} flex items-center gap-1 select-none`}>
                               <Clock className="w-3.5 h-3.5" /> Depletes: {forecastStr} ({remainingDays === 1 ? '1 day' : `${remainingDays} days`} left)
@@ -1301,7 +1318,7 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                 <circle cx="120" cy="120" r="80" fill="url(#ambient_glow)" opacity="0.15" />
                 <circle cx="120" cy="120" r="95" stroke="#E2E8F0" strokeWidth="1" strokeDasharray="4 4" />
                 <circle cx="120" cy="120" r="110" stroke="#F1F5F9" strokeWidth="1" />
-                
+
                 {/* Floating elements */}
                 <path d="M100 45h6v-6h-6v6zm3 3v-9" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" />
                 <path d="M170 200h6v-6h-6v6zm3 3v-9" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" />
@@ -1309,7 +1326,7 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                 <circle cx="176" cy="65" r="4" stroke="#38BDF8" strokeWidth="2" fill="none" />
                 <circle cx="104" cy="76" r="3" stroke="#38BDF8" strokeWidth="2" fill="none" />
                 <circle cx="60" cy="208" r="3.5" stroke="#38BDF8" strokeWidth="1.5" fill="none" />
-                
+
                 {/* Pill Capsule (Left, Green Pastel) */}
                 <g transform="rotate(-30 80 140)">
                   <rect x="55" y="110" width="30" height="60" rx="15" fill="#A7F3D0" />
@@ -1332,7 +1349,7 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
                   {/* Blue Cross on Front Face */}
                   <path d="M112 113 h12 M118 107 v12" stroke="#2563EB" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
-                
+
                 <defs>
                   <radialGradient id="ambient_glow" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stopColor="#38BDF8" stopOpacity="1" />
@@ -1343,24 +1360,6 @@ export default function InventoryManager({ medicines, refills, logs = [], onRefi
             </div>
             <h3 className="text-xl font-bold text-[#061D4C] mb-2">No Tracking Profiles Found</h3>
             <p className="text-sm text-[#64748B] mb-6 max-w-sm">Create your first medication tracking profile to start managing your health journey.</p>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-8 py-3.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-2xl transition-all cursor-pointer shadow-lg flex items-center gap-2 shadow-[0_8px_24px_rgba(37,99,235,0.2)]"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add Medication
-            </button>
-
-            {/* Floating Action Plus Button positioned inside bottom-right corner */}
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="absolute bottom-6 right-6 w-14 h-14 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer font-bold"
-              title="Add New Medication"
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </button>
           </div>
         )}
       </div>

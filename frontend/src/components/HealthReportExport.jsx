@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Download, Printer, Share2, Loader, CheckCircle } from 'lucide-react';
+import { FileText, Download, Printer, Share2, Loader, CheckCircle, ChevronDown } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { calculateAdherenceMetrics } from '../services/insightsEngine';
 
@@ -726,7 +726,7 @@ Generated via HealthStock Patient Portal.`;
           <option value="Yearly">Yearly Report</option>
           <option value="Custom">Custom Range</option>
         </select>
-        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[8px] text-[#64748B] pointer-events-none">▼</span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
 
       {/* Standalone PDF Button */}

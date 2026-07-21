@@ -9,7 +9,7 @@ const vapidKeys = {
 
 if (vapidKeys.publicKey && vapidKeys.privateKey) {
   webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:admin@trulicare.com',
+    process.env.VAPID_EMAIL || 'mailto:admin@healthstock.com',
     vapidKeys.publicKey,
     vapidKeys.privateKey
   );

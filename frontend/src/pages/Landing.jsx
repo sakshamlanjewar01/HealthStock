@@ -17,9 +17,32 @@ export default function Landing({ onNavigate, setActiveModal }) {
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
   const navLinks = ['Home', 'Features', 'Benefits'];
+  const [activeSection, setActiveSection] = useState('Home');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const navHeight = 120;
+      const sections = navLinks.map(link => link.toLowerCase().replace(/\s+/g, '-'));
+      
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i]);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= navHeight) {
+            setActiveSection(navLinks[i]);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleNavClick = (e, link) => {
     e.preventDefault();
+    setActiveSection(link);
     setMobileMenuOpen(false);
     const targetId = link.toLowerCase().replace(/\s+/g, '-');
     const element = document.getElementById(targetId);
@@ -47,42 +70,6 @@ export default function Landing({ onNavigate, setActiveModal }) {
       opacity: 1, 
       y: 0, 
       transition: { type: "spring", stiffness: 100, damping: 16 } 
-    }
-  };
-
-  const cardHoverBlue = {
-    hover: { 
-      y: -6, 
-      borderColor: "rgba(11, 83, 250, 0.25)",
-      boxShadow: "0 20px 40px rgba(11, 83, 250, 0.08)",
-      transition: { type: "spring", stiffness: 300, damping: 20 }
-    }
-  };
-
-  const cardHoverGreen = {
-    hover: { 
-      y: -6, 
-      borderColor: "rgba(19, 115, 51, 0.25)",
-      boxShadow: "0 20px 40px rgba(19, 115, 51, 0.08)",
-      transition: { type: "spring", stiffness: 300, damping: 20 }
-    }
-  };
-
-  const cardHoverPurple = {
-    hover: { 
-      y: -6, 
-      borderColor: "rgba(112, 48, 160, 0.25)",
-      boxShadow: "0 20px 40px rgba(112, 48, 160, 0.08)",
-      transition: { type: "spring", stiffness: 300, damping: 20 }
-    }
-  };
-
-  const bentoCardHover = {
-    hover: {
-      y: -6,
-      borderColor: "rgba(15, 47, 87, 0.08)",
-      boxShadow: "0 20px 40px rgba(15, 47, 87, 0.03)",
-      transition: { type: "spring", stiffness: 300, damping: 20 }
     }
   };
 
@@ -129,7 +116,7 @@ export default function Landing({ onNavigate, setActiveModal }) {
         {/* Desktop Center Links */}
         <div className="hidden lg:flex items-center gap-10">
           {navLinks.map((link) => {
-            const isActive = link === 'Home';
+            const isActive = activeSection === link;
             return (
               <div key={link} className="relative flex flex-col items-center py-2">
                 <a href={`#${link.toLowerCase()}`} onClick={(e) => handleNavClick(e, link)}
@@ -326,18 +313,17 @@ export default function Landing({ onNavigate, setActiveModal }) {
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {[
-            { icon: <Calendar className="w-5 h-5 text-[#0B53FA]" />, iconBg: 'bg-[#EAF2FC]', title: 'Smart Scheduling', desc: 'Visual daily timelines and customized multi-dose reminders for every medication.', hoverVar: cardHoverBlue },
-            { icon: <Package className="w-5 h-5 text-[#137333]" />, iconBg: 'bg-[#E6F4EA]', title: 'Inventory Tracking', desc: 'Automatic countdowns, critical stock alerts, and refill forecasts.', hoverVar: cardHoverGreen },
-            { icon: <PieChart className="w-5 h-5 text-[#7030A0]" />, iconBg: 'bg-[#F2E6FF]', title: 'Health Analytics', desc: 'Create health analytics expanded in extents and accounts of your health analytics.', hoverVar: cardHoverPurple },
+            { icon: <Calendar className="w-5 h-5 text-[#0B53FA]" />, iconBg: 'bg-[#EAF2FC]', title: 'Smart Scheduling', desc: 'Visual daily timelines and customized multi-dose reminders for every medication.', hoverBorder: 'hover:border-[#0B53FA]/30 hover:shadow-[0_20px_40px_rgba(11,83,250,0.08)]' },
+            { icon: <Package className="w-5 h-5 text-[#137333]" />, iconBg: 'bg-[#E6F4EA]', title: 'Inventory Tracking', desc: 'Automatic countdowns, critical stock alerts, and refill forecasts.', hoverBorder: 'hover:border-[#137333]/30 hover:shadow-[0_20px_40px_rgba(19,115,51,0.08)]' },
+            { icon: <PieChart className="w-5 h-5 text-[#7030A0]" />, iconBg: 'bg-[#F2E6FF]', title: 'Health Analytics', desc: 'Create health analytics expanded in extents and accounts of your health analytics.', hoverBorder: 'hover:border-[#7030A0]/30 hover:shadow-[0_20px_40px_rgba(112,48,160,0.08)]' },
           ].map((f) => (
             <motion.div 
               key={f.title} 
               variants={fadeInUp}
-              whileHover="hover"
+              whileHover={{ y: -6 }}
               initial="rest"
-              className="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_12px_40px_rgba(15,47,87,0.02)] border border-slate-100/80 flex flex-col justify-between items-start text-left min-h-[220px] relative transition-colors"
+              className={`bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_12px_40px_rgba(15,47,87,0.02)] border border-slate-100/80 flex flex-col justify-between items-start text-left min-h-[220px] relative transition-all duration-300 ${f.hoverBorder}`}
             >
-              <motion.div variants={f.hoverVar} className="absolute inset-0 border border-transparent rounded-[2rem] pointer-events-none" />
               <div className="w-full relative z-10">
                 <div className={`w-12 h-12 ${f.iconBg} rounded-2xl flex items-center justify-center mb-5`}>
                   {f.icon}
@@ -410,11 +396,10 @@ export default function Landing({ onNavigate, setActiveModal }) {
             {/* Bento Cell 1: Pharmacy Dispatch Text */}
             <motion.div 
               variants={fadeInUp}
-              whileHover="hover"
+              whileHover={{ y: -6 }}
               initial="rest"
-              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-[0_12px_40px_rgba(15,47,87,0.02)] border border-slate-100/80 flex flex-col justify-between text-left min-h-[240px] relative transition-colors"
+              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-[0_12px_40px_rgba(15,47,87,0.02)] hover:shadow-[0_20px_40px_rgba(15,47,87,0.08)] border border-slate-100/80 hover:border-slate-200 flex flex-col justify-between text-left min-h-[240px] relative transition-all duration-300"
             >
-              <motion.div variants={bentoCardHover} className="absolute inset-0 border border-transparent rounded-[2rem] pointer-events-none" />
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-[#EAF2FC] rounded-2xl flex items-center justify-center mb-5">
                   <Home className="w-5 h-5 text-[#0B53FA]" />
@@ -456,11 +441,10 @@ export default function Landing({ onNavigate, setActiveModal }) {
             {/* Bento Cell 4: Family Support Text */}
             <motion.div 
               variants={fadeInUp}
-              whileHover="hover"
+              whileHover={{ y: -6 }}
               initial="rest"
-              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-[0_12px_40px_rgba(15,47,87,0.02)] border border-slate-100/80 flex flex-col justify-between text-left min-h-[240px] relative transition-colors"
+              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-[0_12px_40px_rgba(15,47,87,0.02)] hover:shadow-[0_20px_40px_rgba(15,47,87,0.08)] border border-slate-100/80 hover:border-slate-200 flex flex-col justify-between text-left min-h-[240px] relative transition-all duration-300"
             >
-              <motion.div variants={bentoCardHover} className="absolute inset-0 border border-transparent rounded-[2rem] pointer-events-none" />
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-[#E6F4EA] rounded-2xl flex items-center justify-center mb-5">
                   <Users className="w-5 h-5 text-[#137333]" />
@@ -554,15 +538,12 @@ export default function Landing({ onNavigate, setActiveModal }) {
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           
           {/* Logo on the left */}
-          <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={(e) => handleNavClick(e, 'Home')}>
-            <Logo className="w-8 h-8" />
+          <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={(e) => handleNavClick(e, 'Home')}>
+            <Logo className="w-9 h-9" />
             <div className="flex flex-col leading-none text-left">
-              <div className="text-[15px] font-extrabold tracking-tight leading-none">
-                <span className="text-[#0F2F57]">Health</span>
-                <span className="text-[#10B981]">stock</span>
-              </div>
-              <span className="text-[#95A6B7] text-[7.5px] font-bold tracking-[0.06em] uppercase mt-1">
-                Track <span className="text-[#0B53FA]">•</span> Manage <span className="text-[#10B981]">•</span> Live Well
+              <span className="text-xl font-extrabold text-[#0F2F57] tracking-tight">Healthstock</span>
+              <span className="text-[9px] font-extrabold text-[#94A3B8] uppercase tracking-[0.25em] mt-1">
+                INTELLIGENCE
               </span>
             </div>
           </div>

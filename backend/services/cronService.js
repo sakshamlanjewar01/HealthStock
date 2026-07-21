@@ -172,7 +172,7 @@ export const startCronJobs = () => {
                   await sendMail({
                     to: user.email,
                     subject: `⏰ Reminder: Time to take ${med.name} in 15 mins`,
-                    text: `Hello ${user.name},\n\nThis is your automated pre-alarm from Trulicare. It is almost time to take your scheduled dose of ${med.name} at ${med.reminderTime}.${stockWarning}\n\nPlease prepare your medication now.\n\nBest regards,\nYour Trulicare Assistant`
+                    text: `Hello ${user.name},\n\nThis is your automated pre-alarm from Healthstock. It is almost time to take your scheduled dose of ${med.name} at ${med.reminderTime}.${stockWarning}\n\nPlease prepare your medication now.\n\nBest regards,\nYour Healthstock Assistant`
                   });
                 }
 
@@ -204,12 +204,12 @@ export const startCronJobs = () => {
 
                 // 3. Dispatch SMS alerts
                 if (user.notificationPreference === 'SMS' && user.phoneNumber) {
-                  await sendSMS(user.phoneNumber, `⏰ Trulicare Reminder: Time to take your scheduled dose of ${med.name} at ${med.reminderTime}. ${isLowStock ? 'Warning: Low stock!' : ''}`);
+                  await sendSMS(user.phoneNumber, `⏰ Healthstock Reminder: Time to take your scheduled dose of ${med.name} at ${med.reminderTime}. ${isLowStock ? 'Warning: Low stock!' : ''}`);
                 }
 
                 // 4. Dispatch WhatsApp alerts
                 if (user.notificationPreference === 'WhatsApp' && user.phoneNumber) {
-                  await sendWhatsApp(user.phoneNumber, `⏰ Trulicare Reminder: Time to take your scheduled dose of ${med.name} at ${med.reminderTime}. ${isLowStock ? 'Warning: Low stock!' : ''}`);
+                  await sendWhatsApp(user.phoneNumber, `⏰ Healthstock Reminder: Time to take your scheduled dose of ${med.name} at ${med.reminderTime}. ${isLowStock ? 'Warning: Low stock!' : ''}`);
                 }
              }
           }
@@ -241,8 +241,8 @@ export const startCronJobs = () => {
 
         await sendMail({
           to: user.email,
-          subject: `📊 Your Monthly Trulicare Adherence Report`,
-          text: `Hello ${user.name},\n\nPlease find attached your automated monthly Trulicare medication adherence report for the past 30 days.\n\nBest regards,\nYour Trulicare Portal`,
+          subject: `📊 Your Monthly Healthstock Adherence Report`,
+          text: `Hello ${user.name},\n\nPlease find attached your automated monthly Healthstock medication adherence report for the past 30 days.\n\nBest regards,\nYour Healthstock Portal`,
           attachments: [
             {
               filename: `adherence-report-${new Date().getMonth() + 1}-${new Date().getFullYear()}.pdf`,

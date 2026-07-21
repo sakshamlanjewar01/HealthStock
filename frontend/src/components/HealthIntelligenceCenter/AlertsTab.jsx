@@ -9,25 +9,25 @@ export default function AlertsTab({
   setActiveTab
 }) {
   return (
-    <div className="space-y-8 text-left w-full mx-auto pb-8 relative z-20">
+    <div className="space-y-8 text-left w-full mx-auto pt-4 pb-12 relative z-20">
       {/* Header */}
-      <div className="space-y-2 mt-6">
+      <div className="bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-2 mb-6">
         <div className="flex items-center gap-3">
           <span className="w-10 h-10 rounded-2xl bg-[#FF2056] text-white flex items-center justify-center shrink-0 font-extrabold text-xl shadow-[0_4px_12px_rgba(255,32,86,0.2)]">
             !
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#061D4C] tracking-tight">Important Alerts</h1>
+          <h1 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight">Important Alerts</h1>
         </div>
-        <p className="text-sm text-[#64748B] max-w-2xl leading-relaxed">
+        <p className="text-sm text-[#4B6B8B] font-medium mt-1 max-w-2xl leading-relaxed">
           Your personal safety dashboard. Stay on top of missed medications, potential drug interactions, and critical refill reminders to ensure your health is never compromised.
         </p>
       </div>
 
-      {/* Three Columns Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Two Columns Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Column 1: Missed Medications */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[2rem] p-5 sm:p-7 flex flex-col justify-between shadow-[0px_10px_30px_rgba(37,99,235,0.08)] min-h-[400px] sm:min-h-[420px]">
+        <div className="bg-white border border-slate-100/80 rounded-[2rem] p-5 sm:p-7 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.02)] min-h-[400px] sm:min-h-[420px]">
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[#FFF5F5] flex items-center justify-center shrink-0">
@@ -36,8 +36,8 @@ export default function AlertsTab({
                 </svg>
               </div>
               <div className="text-left">
-                <h3 className="text-[17px] font-bold text-[#061D4C] tracking-tight">Missed Medications</h3>
-                <p className="text-[10px] text-[#64748B] font-extrabold uppercase tracking-wider mt-0.5">
+                <h3 className="text-[17px] font-bold text-[#0F2F57] tracking-tight">Missed Medications</h3>
+                <p className="text-[10px] text-[#4B6B8B] font-extrabold uppercase tracking-wider mt-0.5">
                   {logs.filter(l => l.status === 'missed').length} Missed Doses
                 </p>
               </div>
@@ -50,8 +50,8 @@ export default function AlertsTab({
                     <div className="flex items-center gap-3">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#FF2056] shrink-0" />
                       <div className="text-left">
-                        <p className="font-bold text-[#061D4C] text-xs sm:text-[13px] leading-tight">{log.medicineName}</p>
-                        <p className="text-[11px] text-[#64748B] mt-0.5">Missed {log.date} at {log.timeOfDay}</p>
+                        <p className="font-bold text-[#0F2F57] text-xs sm:text-[13px] leading-tight">{log.medicineName}</p>
+                        <p className="text-[11px] text-[#4B6B8B] font-medium mt-0.5">Missed {log.date} at {log.timeOfDay}</p>
                       </div>
                     </div>
                     <button onClick={() => setAlertsPageModal({ title: `Missed Dose: ${log.medicineName}`, message: `Dose scheduled at ${log.timeOfDay} on ${log.date} was marked as missed.` })} className="text-xs font-bold text-[#FF2056] hover:underline transition-colors cursor-pointer">Review</button>
@@ -66,78 +66,6 @@ export default function AlertsTab({
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 mt-6 text-left">
-            <button
-              onClick={() => setAlertsPageModal({ title: 'Mark All Read', message: 'All missed medication alerts have been acknowledged.' })}
-              className="text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors cursor-pointer flex items-center gap-1"
-            >
-              Acknowledge All <ChevronRight className="w-3 h-3 text-[#2563EB]" />
-            </button>
-          </div>
-        </div>
-
-        {/* Column 2: Drug Interactions */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[2rem] p-5 sm:p-7 flex flex-col justify-between shadow-[0px_10px_30px_rgba(37,99,235,0.08)] min-h-[400px] sm:min-h-[420px]">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
-                <Shield className="w-6 h-6 text-[#2563EB]" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-[17px] font-bold text-[#061D4C] tracking-tight">Drug Interactions</h3>
-                <p className="text-[10px] text-[#2563EB] font-extrabold uppercase tracking-wider mt-0.5">Automated Screening</p>
-              </div>
-            </div>
-
-            {/* Interaction Alerts */}
-            {interactionAlerts && interactionAlerts.length > 0 ? (
-              <div className="space-y-4 overflow-y-auto max-h-[220px] pr-1">
-                {interactionAlerts.map((alert, index) => (
-                  <div key={index} className="bg-rose-50/50 border border-rose-100 rounded-3xl p-5 space-y-4 text-left">
-                    <div className="text-xs">
-                      <p className="font-extrabold text-[#ff2056] flex items-center gap-1.5 text-[13px]">
-                        ⚠️ {alert.severity || 'Severe'} Conflict
-                      </p>
-                      <p className="text-slate-600 leading-relaxed mt-2 text-[11px]">
-                        {alert.medA} + {alert.medB} interaction: {alert.effect}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => setAlertsPageModal({ title: 'Consultation Sent', message: `Interaction review request regarding ${alert.medA} + ${alert.medB} has been dispatched to the attending physician (MD).` })} className="flex-1 py-2 px-3 bg-white text-slate-700 border border-slate-200 font-bold text-[11px] rounded-full hover:bg-slate-50 transition-colors cursor-pointer w-full text-center">
-                        Consult MD
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-[#EFF6FF]/60 border border-[#DBEAFE] rounded-3xl p-6 text-center flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-                  <Shield className="w-5 h-5 text-[#2563EB]" />
-                </div>
-                <div>
-                  <p className="text-xs text-[#061D4C] font-extrabold">0 Conflicts Detected</p>
-                  <p className="text-[10px] text-[#64748B] mt-1 leading-relaxed">Screening completed. No interactions found among your medicines.</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Recent Screenings */}
-          <div className="mt-6 space-y-3 text-left pt-4 border-t border-slate-50">
-            <p className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider border-b border-slate-100 pb-1.5">Recent Screenings</p>
-            {medicines.length > 1 ? (
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#64748B] font-semibold">{medicines[0].name} + {medicines[1].name}</span>
-                  <span onClick={() => setAlertsPageModal({ title: 'Screening Log', message: `Screening completed for ${medicines[0].name} and ${medicines[1].name}.` })} className="font-bold text-[#2563EB] hover:underline cursor-pointer text-[11px]">Safe</span>
-                </div>
-              </div>
-            ) : (
-              <p className="text-[10px] text-[#64748B]">Add 2 or more medicines to view screenings.</p>
-            )}
           </div>
         </div>
 

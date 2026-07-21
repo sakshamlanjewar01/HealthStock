@@ -2,7 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { Settings, HelpCircle, LogOut, X, Shield, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ConfirmProvider } from './context/ConfirmContext';
+import { ConfirmProvider, useConfirm } from './context/ConfirmContext';
 import HealthIntelligenceCenter from './pages/HealthIntelligenceCenter';
 import { HealthStoreProvider } from './context/HealthStoreContext';
 import Login from './pages/Login';
@@ -18,11 +18,18 @@ const SettingsModal = React.lazy(() => import('./features/settings').then(m => (
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
+  const confirm = useConfirm();
   const [authView, setAuthView] = useState('landing');
   const [resetToken, setResetToken] = useState('');
+  const [logoutMessage, setLogoutMessage] = useState('');
+
   const handleLogout = async () => {
+    const isConfirmed = await confirm('Are you sure you want to sign out of your HealthStock account?');
+    if (!isConfirmed) return;
     await logout();
-    setAuthView('landing');
+    setLogoutMessage('You have been signed out successfully.');
+    setAuthView('login');
+    setTimeout(() => setLogoutMessage(''), 4000);
   };
   const [activeModal, setActiveModal] = useState(null); // 'settings', 'privacy', 'terms', 'docs'
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -97,30 +104,38 @@ function AppContent() {
             <>
               {/* Overlay transparent backdrop to close dropdown */}
               <div 
-                className="fixed inset-0 z-40" 
+                className="fixed inset-0 z-40 cursor-default" 
                 onClick={() => setProfileDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-scaleUp">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-slate-200/90 rounded-3xl shadow-xl p-4 pt-6 pb-8 z-50 animate-scaleUp text-left space-y-3">
+                {/* User Info Header in Dropdown */}
+                <div className="px-4 py-3 bg-slate-50/80 rounded-xl mb-2 border border-slate-100/80">
+                  <p className="text-sm font-extrabold text-[#0F2F57] truncate">{user?.name || 'User Profile'}</p>
+                  <p className="text-[11px] text-slate-400 font-medium truncate">{user?.email || 'Active Account'}</p>
+                </div>
+
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
                     setActiveModal('settings');
                   }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-[#4B6B8B] hover:text-[#0F2F57] hover:bg-slate-50 transition-colors font-semibold flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-4 py-4 text-xs font-extrabold text-[#0F2F57] hover:bg-[#0B53FA]/10 hover:text-[#0B53FA] rounded-xl transition-all flex items-center gap-3 cursor-pointer"
                 >
-                  <Settings className="w-4 h-4" />
-                  Settings
+                  <Settings className="w-4.5 h-4.5 text-slate-400" />
+                  <span>Settings</span>
                 </button>
+
                 <div className="h-px bg-slate-100 my-1" />
+
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
                     handleLogout();
                   }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 transition-colors font-semibold flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-4 py-4 text-xs font-extrabold text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-3 cursor-pointer"
                 >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
+                  <LogOut className="w-4.5 h-4.5 text-rose-500" />
+                  <span>Sign Out</span>
                 </button>
               </div>
             </>
@@ -151,18 +166,15 @@ function AppContent() {
             <div className="hidden md:flex flex-row justify-between items-center py-4">
               {/* Brand */}
               <div className="flex flex-col items-start gap-1 w-1/3 text-left">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-md bg-[#2563EB] flex items-center justify-center shadow-sm">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="9" y="2" width="6" height="20" rx="2" fill="white" />
-                      <rect x="2" y="9" width="20" height="6" rx="2" fill="white" />
-                    </svg>
+                <div className="flex items-center gap-3">
+                  <Logo className="w-9 h-9" />
+                  <div className="flex flex-col leading-none">
+                    <span className="text-xl font-extrabold text-[#0F2F57] tracking-tight">Healthstock</span>
+                    <span className="text-[9px] font-extrabold text-[#94A3B8] uppercase tracking-[0.25em] mt-1">
+                      INTELLIGENCE
+                    </span>
                   </div>
-                  <span className="text-[15px] font-black text-[#0F2F57] tracking-tight">HealthStock</span>
                 </div>
-                <p className="text-[8px] font-black text-[#95A6B7] uppercase tracking-[0.1em] mt-0.5">
-                  ADVANCED HEALTH INTELLIGENCE
-                </p>
               </div>
               {/* Links */}
               <div className="flex items-center justify-center gap-6 w-1/3">
@@ -189,18 +201,15 @@ function AppContent() {
             <div className="flex md:hidden flex-col items-center text-center gap-5">
               {/* Logo */}
               <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#0F2F57] flex items-center justify-center shadow-sm">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="9" y="2" width="6" height="20" rx="2" fill="white" />
-                      <rect x="2" y="9" width="20" height="6" rx="2" fill="white" />
-                    </svg>
+                <div className="flex items-center gap-3">
+                  <Logo className="w-10 h-10" />
+                  <div className="flex flex-col leading-none text-left">
+                    <span className="text-2xl font-extrabold text-[#0F2F57] tracking-tight">Healthstock</span>
+                    <span className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.25em] mt-1">
+                      INTELLIGENCE
+                    </span>
                   </div>
-                  <span className="text-2xl font-extrabold text-[#0F2F57] tracking-tight">HealthStock</span>
                 </div>
-                <p className="text-[9px] font-extrabold text-[#95A6B7] uppercase tracking-[0.2em]">
-                  Advanced Health Intelligence
-                </p>
               </div>
 
               {/* Links Row */}
@@ -233,6 +242,12 @@ function AppContent() {
         <Landing onNavigate={setAuthView} setActiveModal={setActiveModal} />
       ) : (
         <div className="h-screen overflow-hidden bg-[#E1F2F6] flex flex-col font-sans relative">
+          {logoutMessage && (
+            <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-[#0F2F57] text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-extrabold animate-bounce border border-white/10">
+              <Check className="w-4.5 h-4.5 text-[#10B981]" />
+              <span>{logoutMessage}</span>
+            </div>
+          )}
           {/* Persistent Navbar on Auth pages — identical to Landing navbar */}
           <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12 lg:px-20 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm transition-all h-20">
 
@@ -298,7 +313,7 @@ function AppContent() {
           <div className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)} />
 
           {/* Modal Container - slides from bottom on mobile, centered on desktop */}
-          <div className="bg-white p-5 sm:p-8 rounded-t-3xl sm:rounded-3xl border border-slate-100 w-full sm:max-w-xl relative z-10 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-2xl animate-scaleUp">
+          <div className="bg-white p-5 sm:p-8 rounded-t-3xl sm:rounded-3xl border border-slate-100 w-full sm:max-w-xl relative z-10 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto no-scrollbar shadow-2xl animate-scaleUp">
             {/* Mobile drag handle */}
             <div className="sm:hidden w-10 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
 
@@ -306,7 +321,7 @@ function AppContent() {
             <button
               onClick={() => setActiveModal(null)}
               aria-label="Close modal"
-              className="absolute top-4 right-4 p-1.5 bg-white border border-slate-100 text-slate-400 hover:text-slate-600 rounded-xl transition-all cursor-pointer shadow-sm"
+              className="absolute top-5 right-5 z-30 p-2 bg-white border border-slate-200 text-slate-500 hover:text-slate-800 rounded-full transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
             >
               <X className="w-4 h-4" />
             </button>

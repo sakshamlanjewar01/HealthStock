@@ -200,8 +200,8 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
             <Activity className="w-5 h-5 text-[#FF2056]" />
           </div>
           <div>
-            <h3 className="text-lg font-extrabold text-[#061D4C] tracking-tight">Symptom Tracker</h3>
-            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Log side effects & analyze correlations</p>
+            <h3 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight">Symptom Tracker</h3>
+            <p className="text-sm text-[#4B6B8B] font-medium mt-1">Log side effects & analyze correlations</p>
           </div>
         </div>
         <div className="flex bg-slate-100 p-1 rounded-xl gap-0.5">
@@ -248,7 +248,7 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                   required
                   value={date}
                   onChange={e => setDate(e.target.value)}
-                  className="w-full bg-white border-2 border-black focus:border-[#2563EB] rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-bold shadow-sm"
+                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-semibold transition-all shadow-sm"
                 />
               </div>
 
@@ -263,7 +263,11 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                   max="10"
                   value={severity}
                   onChange={e => setSeverity(parseInt(e.target.value, 10))}
-                  className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#FF2056] mt-2.5"
+                  style={{
+                    background: `linear-gradient(to right, #FF2056 ${((severity - 1) / 9) * 100}%, #E2E8F0 ${((severity - 1) / 9) * 100}%)`,
+                    height: '8px'
+                  }}
+                  className="w-full rounded-lg appearance-none cursor-pointer accent-[#FF2056] mt-2.5"
                 />
               </div>
             </div>
@@ -276,7 +280,7 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                   placeholder="e.g. 120"
                   value={systolic}
                   onChange={e => setSystolic(e.target.value)}
-                  className="w-full bg-white border-2 border-black focus:border-[#2563EB] rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-bold shadow-sm"
+                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-semibold transition-all shadow-sm"
                 />
               </div>
               <div className="space-y-1.5">
@@ -286,7 +290,7 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                   placeholder="e.g. 80"
                   value={diastolic}
                   onChange={e => setDiastolic(e.target.value)}
-                  className="w-full bg-white border-2 border-black focus:border-[#2563EB] rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-bold shadow-sm"
+                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-semibold transition-all shadow-sm"
                 />
               </div>
               <div className="space-y-1.5">
@@ -296,7 +300,7 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                   placeholder="e.g. 72"
                   value={heartRate}
                   onChange={e => setHeartRate(e.target.value)}
-                  className="w-full bg-white border-2 border-black focus:border-[#2563EB] rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-bold shadow-sm"
+                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-semibold transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -331,7 +335,7 @@ export default function SymptomTracker({ logs = [], medicines = [] }) {
                 placeholder="Log how you are feeling, specific side effects, or external triggers..."
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
-                className="w-full bg-white border-2 border-black focus:border-[#2563EB] rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-bold resize-none shadow-sm"
+                className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 rounded-2xl px-4 py-3 text-sm text-[#061D4C] focus:outline-none font-semibold resize-none transition-all shadow-sm"
               />
             </div>
 

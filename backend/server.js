@@ -19,12 +19,17 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   process.env.CLIENT_URL || '',
   'http://localhost:5173',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:5174'
 ].filter(Boolean);
+
 app.use(cors({
   origin: function (origin, callback) {
     console.log('[CORS Request Debug] Incoming Origin:', origin, 'Allowed Origins:', allowedOrigins);
-    if (!origin || allowedOrigins.includes(origin)) {
+    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || '');
+    if (!origin || allowedOrigins.includes(origin) || isLocalhost) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -94,20 +99,24 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Rate Limiting Config
+const isDevMode = process.env.NODE_ENV !== 'production';
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: isDevMode ? 5000 : 200,
   message: { success: false, message: 'Too many requests, please try again later.' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: () => isDevMode
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 15,
+  max: isDevMode ? 5000 : 30,
   message: { success: false, message: 'Too many authentication attempts, please try again later.' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: () => isDevMode
 });
 
 app.use('/api', apiLimiter);
@@ -118,7 +127,7 @@ app.use('/api/auth/signup', authLimiter);
 // Database connection
 const connectDB = async () => {
   try {
-    const connStr = process.env.MONGODB_URI || 'mongodb://localhost:27017/trulicare';
+    const connStr = process.env.MONGODB_URI || 'mongodb://localhost:27017/healthstock';
     await mongoose.connect(connStr, {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
@@ -137,7 +146,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/data', dataRoutes);
 
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'UP', message: 'Trulicare API is online' });
+  res.status(200).json({ status: 'UP', message: 'Healthstock API is online' });
 });
 
 // Global Centralized Error Handling Middleware

@@ -118,8 +118,8 @@ export const updateMedicine = async (req, res, next) => {
       if (user && user.email && user.notificationPreference !== 'None') {
         await sendMail({
           to: user.email,
-          subject: `✅ Trulicare Confirmation: Refill Processed for ${med.name}`,
-          text: `Hello ${user.name || 'User'},\n\nSuccess: Your refill for ${med.name} was processed successfully.\nYour inventory is now fully restocked to ${med.totalQuantity} ${med.unit}.\nRefills remaining: ${med.refillsRemaining}.\n\nBest regards,\nYour Trulicare Health Assistant`
+          subject: `✅ Healthstock Confirmation: Refill Processed for ${med.name}`,
+          text: `Hello ${user.name || 'User'},\n\nSuccess: Your refill for ${med.name} was processed successfully.\nYour inventory is now fully restocked to ${med.totalQuantity} ${med.unit}.\nRefills remaining: ${med.refillsRemaining}.\n\nBest regards,\nYour Healthstock Health Assistant`
         });
       }
     }
@@ -171,8 +171,8 @@ const checkAndSendDoseAlerts = async (userId, status, medicineId, medicineName, 
       const statusText = status === 'missed' ? 'missed' : 'skipped';
       await sendMail({
         to: user.email,
-        subject: `⚠️ Trulicare Dose Alert: Dose ${statusText.toUpperCase()} - ${medicineName}`,
-        text: `Hello ${user.name || 'User'},\n\nThis is an automated dose alert from Trulicare.\nYour dose of ${medicineName} (${timeOfDay} dose) on ${date} was recorded as ${statusText.toUpperCase()}.\n\nNote/Symptoms: ${note || 'None logged'}.\n\nPlease update your health log if you take this dose later.\n\nBest regards,\nYour Trulicare Assistant`
+        subject: `⚠️ Healthstock Dose Alert: Dose ${statusText.toUpperCase()} - ${medicineName}`,
+        text: `Hello ${user.name || 'User'},\n\nThis is an automated dose alert from Healthstock.\nYour dose of ${medicineName} (${timeOfDay} dose) on ${date} was recorded as ${statusText.toUpperCase()}.\n\nNote/Symptoms: ${note || 'None logged'}.\n\nPlease update your health log if you take this dose later.\n\nBest regards,\nYour Healthstock Assistant`
       });
     }
 
@@ -182,14 +182,14 @@ const checkAndSendDoseAlerts = async (userId, status, medicineId, medicineName, 
         if (med.currentQuantity === 0) {
           await sendMail({
             to: user.email,
-            subject: `⚠️ Trulicare Stock Alert: ${med.name} is OUT OF STOCK`,
-            text: `Hello ${user.name || 'User'},\n\nWarning: Your inventory for ${med.name} is completely empty (0 ${med.unit} remaining).\n\nPlease process a refill immediately to avoid missing future scheduled doses.\n\nBest regards,\nYour Trulicare Health Assistant`
+            subject: `⚠️ Healthstock Stock Alert: ${med.name} is OUT OF STOCK`,
+            text: `Hello ${user.name || 'User'},\n\nWarning: Your inventory for ${med.name} is completely empty (0 ${med.unit} remaining).\n\nPlease process a refill immediately to avoid missing future scheduled doses.\n\nBest regards,\nYour Healthstock Health Assistant`
           });
         } else if (med.currentQuantity < (med.refillThreshold !== undefined ? med.refillThreshold : 5)) {
           await sendMail({
             to: user.email,
-            subject: `⚠️ Trulicare Stock Warning: ${med.name} is running low`,
-            text: `Hello ${user.name || 'User'},\n\nWarning: Your stock for ${med.name} is running low. Only ${med.currentQuantity} ${med.unit} remaining.\n\nWe recommend refilling your stock soon.\n\nBest regards,\nYour Trulicare Health Assistant`
+            subject: `⚠️ Healthstock Stock Warning: ${med.name} is running low`,
+            text: `Hello ${user.name || 'User'},\n\nWarning: Your stock for ${med.name} is running low. Only ${med.currentQuantity} ${med.unit} remaining.\n\nWe recommend refilling your stock soon.\n\nBest regards,\nYour Healthstock Health Assistant`
           });
         }
       }
@@ -399,7 +399,7 @@ export const dispatchPharmacyRequest = async (req, res, next) => {
           `Rx Number: ${rxNumber || 'N/A'}\n` +
           `Prescribed Doctor: Dr. ${prescribedDoctor || 'N/A'}\n\n` +
           `Please contact the patient or caregiver at ${user ? user.email : 'their registered account'} when ready.\n\n` +
-          `Best regards,\nTrulicare Automated Pharmacy Services`
+          `Best regards,\nHealthstock Automated Pharmacy Services`
       });
     }
 
@@ -413,7 +413,7 @@ export const dispatchPharmacyRequest = async (req, res, next) => {
           `- Medication: ${medicineName}\n` +
           `- Rx Number: ${rxNumber || 'N/A'}\n` +
           `- Pharmacy Phone: ${pharmacyPhone || 'N/A'}\n\n` +
-          `You will receive an alert once the pharmacist processes it.\n\nBest regards,\nTrulicare Assistant`
+          `You will receive an alert once the pharmacist processes it.\n\nBest regards,\nHealthstock Assistant`
       });
     }
 
@@ -570,7 +570,7 @@ export const exportCalendar = async (req, res, next) => {
     let icsContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Trulicare//Medication Calendar//EN',
+      'PRODID:-//Healthstock//Medication Calendar//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH'
     ];

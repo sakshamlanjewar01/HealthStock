@@ -177,22 +177,22 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
   };
 
   return (
-    <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] text-left space-y-6">
+    <div className="space-y-6 text-left w-full mx-auto pt-4 pb-12 relative z-20">
       
-      {/* Brand Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-        <div className="flex items-start gap-4">
+      {/* Standalone Brand Header Card */}
+      <div className="bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
-            <HeartPulse className="w-6 h-6" />
+            <HeartPulse className="w-6 h-6 text-emerald-500" />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-black text-[#0F2F57]">Live Health Progress</h2>
-            <p className="text-xs text-slate-500 font-semibold mt-1">Track daily physiological feedback and post-medication side effects.</p>
+            <h2 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight leading-tight">Live Health Progress</h2>
+            <p className="text-sm text-[#4B6B8B] font-medium mt-1">Track daily physiological feedback and post-medication side effects.</p>
           </div>
         </div>
 
         {/* Tab Controls */}
-        <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 gap-1 select-none">
+        <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 gap-1 select-none shrink-0">
           {[
             { id: 'new', label: 'Log Today' },
             { id: 'history', label: 'History' },
@@ -201,7 +201,7 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${activeTab === t.id ? 'bg-[#0F2F57] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${activeTab === t.id ? 'bg-[#0B53FA] text-white shadow-sm' : 'text-slate-600 hover:text-[#0F2F57]'}`}
             >
               {t.label}
             </button>
@@ -211,7 +211,7 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
 
       {/* Content Panels */}
       {activeTab === 'new' && (
-        <form onSubmit={handleSaveLog} className="space-y-6 animate-fadeIn">
+        <form onSubmit={handleSaveLog} className="bg-white rounded-[2rem] p-6 sm:p-8 border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6 animate-fadeIn">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Left: General Assessment */}
@@ -245,7 +245,11 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
                     max="10"
                     value={healthIndex}
                     onChange={e => setHealthIndex(parseInt(e.target.value, 10))}
-                    className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#10B981]"
+                    style={{
+                      background: `linear-gradient(to right, #10B981 ${((healthIndex - 1) / 9) * 100}%, #E2E8F0 ${((healthIndex - 1) / 9) * 100}%)`,
+                      height: '8px'
+                    }}
+                    className="w-full rounded-lg appearance-none cursor-pointer accent-[#10B981]"
                   />
                   <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1">
                     <span>1 (Poor)</span>
@@ -296,7 +300,7 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
                         placeholder="Systolic (e.g. 120)"
                         value={systolic}
                         onChange={e => setSystolic(e.target.value)}
-                        className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-350 focus:outline-none w-full font-medium"
+                        className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none w-full font-medium"
                       />
                     </div>
                     <span className="text-slate-400 font-bold">/</span>
@@ -306,7 +310,7 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
                         placeholder="Diastolic (e.g. 80)"
                         value={diastolic}
                         onChange={e => setDiastolic(e.target.value)}
-                        className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-350 focus:outline-none w-full font-medium"
+                        className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none w-full font-medium"
                       />
                     </div>
                   </div>
@@ -321,7 +325,7 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
                       placeholder="e.g. 72"
                       value={heartRate}
                       onChange={e => setHeartRate(e.target.value)}
-                      className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-350 focus:outline-none w-full font-medium"
+                      className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none w-full font-medium"
                     />
                   </div>
                 </div>
@@ -335,18 +339,18 @@ export default function HealthProgress({ logs = [], medicines = [] }) {
                   placeholder="How did you feel today after taking your scheduled medicines?"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
-                  className="w-full p-4 border border-slate-200 rounded-2xl text-sm text-slate-850 placeholder-slate-350 focus:outline-none focus:border-[#4571A1] focus:ring-2 focus:ring-[#4571A1]/10 shadow-sm"
+                  className="w-full p-4 border border-slate-200 rounded-2xl text-sm text-slate-850 placeholder:text-slate-400 focus:outline-none focus:border-[#4571A1] focus:ring-2 focus:ring-[#4571A1]/10 shadow-sm"
                 />
               </div>
             </div>
 
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex justify-end">
+          <div className="pt-4 border-t border-slate-100/80 mt-6 flex items-center justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-3 bg-[#0F2F57] hover:bg-[#1a3f6d] text-white text-xs font-extrabold rounded-xl transition-all shadow-sm cursor-pointer disabled:bg-slate-200 disabled:text-slate-400"
+              className="px-7 py-3 bg-[#0B53FA] hover:bg-[#0944CD] text-white text-xs font-black rounded-xl transition-all shadow-md shadow-[#0B53FA]/20 active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? 'Logging...' : 'Save Daily Assessment'}
             </button>

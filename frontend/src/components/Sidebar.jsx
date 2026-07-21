@@ -6,11 +6,10 @@ import Logo from './Logo';
 export default function Sidebar({ user, activeTab, setActiveTab, setActiveModal, logout }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'refills', label: 'Refills', icon: RefreshCw },
     { id: 'progress', label: 'Progress', icon: HeartPulse },
-    { id: 'activity', label: 'History', icon: ClipboardList },
+    { id: 'calendar', label: 'History', icon: Calendar },
     { id: 'alerts', label: 'Alerts', icon: Bell }
   ];
 
@@ -29,7 +28,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, setActiveModal,
           <Logo className="w-9 h-9" />
           <div className="flex flex-col text-left">
             <h1 className="text-[17px] font-black tracking-tight leading-none text-[#0F2F57]">
-              Trulicare
+              Healthstock
             </h1>
             <span className="text-[#95A6B7] text-[8px] font-black tracking-[0.2em] uppercase mt-0.5">
               INTELLIGENCE
@@ -72,19 +71,21 @@ export default function Sidebar({ user, activeTab, setActiveTab, setActiveModal,
           </AnimatePresence>
         </nav>
 
-        {/* Bottom Actions inside the same container */}
-        <div className="space-y-1 pt-4 border-t border-slate-100 mt-auto">
+        {/* Bottom Actions inside a beautiful card wrapper */}
+        <div className="bg-slate-50/60 border border-slate-100 rounded-3xl p-3 pt-5 pb-5 space-y-1.5 mt-auto">
           <button
             onClick={() => setActiveModal('settings')}
-            className="flex items-center gap-3 w-full px-4 py-2.5 text-[#334155] hover:text-[#2563EB] rounded-2xl transition-colors cursor-pointer text-xs font-black text-left hover:bg-[#EFF6FF]"
+            className="flex items-center gap-3 w-full px-4 py-3 text-[#0F2F57] hover:text-[#0B53FA] rounded-2xl transition-all cursor-pointer text-xs font-bold text-left hover:bg-white hover:shadow-xs"
           >
-            <Settings className="w-4 h-4 text-[#64748B]" /> Settings
+            <Settings className="w-4.5 h-4.5 text-slate-400" />
+            <span>Settings</span>
           </button>
           <button
             onClick={() => logout()}
-            className="flex items-center gap-3 w-full px-4 py-2.5 text-rose-500 hover:text-rose-600 rounded-2xl transition-colors cursor-pointer text-xs font-black text-left hover:bg-[#FEF2F2]"
+            className="flex items-center gap-3 w-full px-4 py-3 text-rose-500 hover:text-rose-600 rounded-2xl transition-all cursor-pointer text-xs font-bold text-left hover:bg-rose-50/60"
           >
-            <LogOut className="w-4 h-4 text-rose-500" /> Sign Out
+            <LogOut className="w-4.5 h-4.5 text-rose-500" />
+            <span>Sign Out</span>
           </button>
         </div>
       </div>

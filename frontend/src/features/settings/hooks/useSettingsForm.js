@@ -12,25 +12,27 @@ import { API_URL, VAPID_PUBLIC_KEY } from '../../../config';
 export function useSettingsForm() {
   const { user, updateProfile } = useAuth();
 
-  const [caregiverEmail, setCaregiverEmail]     = useState('');
-  const [notificationPref, setNotificationPref] = useState('Email');
-  const [largeTextEnabled, setLargeTextEnabled] = useState(false);
-  const [userPhone, setUserPhone]               = useState('');
+  const [caregiverEmail, setCaregiverEmail]     = useState(() => user?.caregiverEmail || localStorage.getItem('hs_caregiverEmail') || '');
+  const [notificationPref, setNotificationPref] = useState(() => user?.notificationPreference || localStorage.getItem('hs_notificationPref') || 'Email');
+  const [largeTextEnabled, setLargeTextEnabled] = useState(() => user?.accessibilityLargeText || localStorage.getItem('hs_accessibilityLargeText') === 'true');
+  const [userPhone, setUserPhone]               = useState(() => user?.phoneNumber || localStorage.getItem('hs_userPhone') || '');
   const [isSaving, setIsSaving]                 = useState(false);
 
-  // Sync local form state whenever the authenticated user changes
+  // Sync local form state whenever the authenticated user or local storage changes
   useEffect(() => {
-    if (user) {
-      setCaregiverEmail(user.caregiverEmail || '');
-      setNotificationPref(user.notificationPreference || 'Email');
-      setLargeTextEnabled(user.accessibilityLargeText || false);
-      setUserPhone(user.phoneNumber || '');
-    }
+    const savedEmail = user?.caregiverEmail || localStorage.getItem('hs_caregiverEmail') || '';
+    const savedPref = user?.notificationPreference || localStorage.getItem('hs_notificationPref') || 'Email';
+    const savedLargeText = user?.accessibilityLargeText ?? (localStorage.getItem('hs_accessibilityLargeText') === 'true');
+    const savedPhone = user?.phoneNumber || localStorage.getItem('hs_userPhone') || '';
+
+    setCaregiverEmail(savedEmail);
+    setNotificationPref(savedPref);
+    setLargeTextEnabled(savedLargeText);
+    setUserPhone(savedPhone);
   }, [user]);
 
   /**
-   * Persist all preferences to the backend.
-   * Returns true on success, throws on failure.
+   * Persist all preferences to the backend & localStorage.
    */
   const saveSettings = async () => {
     setIsSaving(true);
@@ -40,6 +42,12 @@ export function useSettingsForm() {
       } else {
         await unsubscribePush(`${API_URL}/data`);
       }
+
+      // Persist locally for immediate offline/reload resilience
+      localStorage.setItem('hs_caregiverEmail', caregiverEmail);
+      localStorage.setItem('hs_userPhone', userPhone);
+      localStorage.setItem('hs_notificationPref', notificationPref);
+      localStorage.setItem('hs_accessibilityLargeText', String(largeTextEnabled));
 
       await updateProfile({
         caregiverEmail,

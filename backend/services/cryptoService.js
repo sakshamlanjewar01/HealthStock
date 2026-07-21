@@ -3,7 +3,7 @@ import crypto from 'crypto';
 const ALGORITHM = 'aes-256-cbc';
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY 
   ? Buffer.from(process.env.ENCRYPTION_KEY, 'hex') 
-  : crypto.scryptSync('default_trulicare_secret_key_123', 'salt', 32);
+  : crypto.scryptSync('default_healthstock_secret_key_123', 'salt', 32);
 const IV_LENGTH = 16;
 
 export function encrypt(text) {

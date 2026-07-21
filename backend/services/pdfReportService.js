@@ -18,7 +18,7 @@ export const generateAdherenceReportPDF = (user, medicines, logs) => {
       doc.on('error', (err) => reject(err));
 
       // Title Section
-      doc.fontSize(24).fillColor('#0F2F57').text('Trulicare Adherence Report', { align: 'center' });
+      doc.fontSize(24).fillColor('#0F2F57').text('Healthstock Adherence Report', { align: 'center' });
       doc.moveDown(0.5);
       doc.fontSize(10).fillColor('#7a8a9b').text(`Report Compiled on: ${new Date().toLocaleDateString()}`, { align: 'center' });
       doc.moveDown(1.5);
@@ -67,7 +67,7 @@ export const generateAdherenceReportPDF = (user, medicines, logs) => {
       }
 
       doc.moveDown(2);
-      doc.fontSize(8).fillColor('#94a3b8').text('This is an automated performance report from Trulicare Portal. For clinical analysis, please share this file with your prescribing doctor.', { align: 'center' });
+      doc.fontSize(8).fillColor('#94a3b8').text('This is an automated performance report from Healthstock Portal. For clinical analysis, please share this file with your prescribing doctor.', { align: 'center' });
 
       doc.end();
     } catch (e) {

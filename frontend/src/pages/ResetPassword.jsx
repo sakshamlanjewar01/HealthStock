@@ -121,7 +121,7 @@ export default function ResetPassword({ token, onComplete }) {
               {/* New Password */}
               <motion.div variants={itemVariants} className="space-y-1.5">
                 <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">New Password</label>
-                <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+                <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#4571A1] focus-within:ring-4 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
                   <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -129,7 +129,7 @@ export default function ResetPassword({ token, onComplete }) {
                     placeholder="••••••••"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium"
+                    className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium"
                   />
                   <button
                     type="button"
@@ -144,7 +144,7 @@ export default function ResetPassword({ token, onComplete }) {
               {/* Confirm Password */}
               <motion.div variants={itemVariants} className="space-y-1.5">
                 <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Confirm Password</label>
-                <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+                <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#4571A1] focus-within:ring-4 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
                   <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -152,7 +152,7 @@ export default function ResetPassword({ token, onComplete }) {
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
-                    className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium"
+                    className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium"
                   />
                   <button
                     type="button"

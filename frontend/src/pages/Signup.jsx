@@ -63,11 +63,34 @@ export default function Signup({ onToggleView }) {
     }
   };
 
-  const handleGoogleClick = () => {
+  const loadGoogleSDK = () => {
+    return new Promise((resolve) => {
+      if (window.google && window.google.accounts) {
+        return resolve(true);
+      }
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(true), { once: true });
+        existingScript.addEventListener('error', () => resolve(false), { once: true });
+        setTimeout(() => resolve(!!(window.google && window.google.accounts)), 3000);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  };
+
+  const handleGoogleClick = async () => {
     setError(null);
     setErrorMessage('');
 
-    if (!window.google || !window.google.accounts) {
+    const isLoaded = await loadGoogleSDK();
+
+    if (!isLoaded || !window.google || !window.google.accounts) {
       setErrorMessage('Google Sign-In SDK is blocked or not loaded yet. If you have an ad-blocker or privacy extension active, please disable it for this site and try again.');
       setShowConfigModal(true);
       return;
@@ -150,11 +173,11 @@ export default function Signup({ onToggleView }) {
 
       <motion.div
         variants={containerVariants}
-        className="bg-white border border-slate-100/80 p-8 sm:p-10 rounded-[2rem] w-full max-w-[440px] relative z-10 space-y-5 shadow-[0_16px_48px_rgba(15,47,87,0.04)]"
+        className="bg-white border border-slate-100/80 p-8 sm:p-10 rounded-[2rem] w-full max-w-[440px] relative z-10 space-y-5 shadow-[0_20px_50px_rgba(15,47,87,0.06)]"
       >
         <motion.div variants={itemVariants} className="text-center space-y-3 flex flex-col items-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white border border-slate-100 rounded-2xl mb-1 shadow-md">
-            <UserPlus className="w-8 h-8 text-[#4571A1] fill-[#4571A1]/10 stroke-[2]" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#0B53FA]/5 border border-[#0B53FA]/10 rounded-2xl mb-1 shadow-sm">
+            <UserPlus className="w-8 h-8 text-[#0B53FA] fill-[#0B53FA]/10 stroke-[2]" />
           </div>
           <h2 className="text-[28px] font-black text-[#0F2F57] tracking-tight leading-none">Create Account</h2>
           <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-xs">
@@ -180,15 +203,15 @@ export default function Signup({ onToggleView }) {
           {/* Full Name */}
           <motion.div variants={itemVariants} className="space-y-1.5">
             <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Full Name</label>
-            <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
-              <UserIcon className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
+            <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#0B53FA] focus-within:ring-4 focus-within:ring-[#0B53FA]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+              <UserIcon className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#0B53FA] transition-colors" />
               <input
                 type="text"
                 required
                 placeholder="John Doe"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium"
+                className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium"
               />
             </div>
           </motion.div>
@@ -196,15 +219,15 @@ export default function Signup({ onToggleView }) {
           {/* Email Address */}
           <motion.div variants={itemVariants} className="space-y-1.5">
             <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Email Address</label>
-            <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
-              <Mail className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
+            <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#0B53FA] focus-within:ring-4 focus-within:ring-[#0B53FA]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+              <Mail className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#0B53FA] transition-colors" />
               <input
                 type="email"
                 required
                 placeholder="john@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium"
+                className="bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium"
               />
             </div>
           </motion.div>
@@ -212,20 +235,20 @@ export default function Signup({ onToggleView }) {
           {/* Password */}
           <motion.div variants={itemVariants} className="space-y-1.5">
             <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Password</label>
-            <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
-              <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
+            <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#0B53FA] focus-within:ring-4 focus-within:ring-[#0B53FA]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+              <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#0B53FA] transition-colors" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="At least 6 characters"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className={`bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium ${!showPassword ? 'tracking-widest' : ''}`}
+                className={`bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium ${!showPassword ? 'tracking-widest' : ''}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-slate-400 hover:text-[#4571A1] focus:outline-none ml-2 shrink-0 cursor-pointer"
+                className="text-slate-400 hover:text-[#0B53FA] focus:outline-none ml-2 shrink-0 cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
               </button>
@@ -251,20 +274,20 @@ export default function Signup({ onToggleView }) {
           {/* Confirm Password */}
           <motion.div variants={itemVariants} className="space-y-1.5">
             <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Confirm Password</label>
-            <div className="relative flex items-center bg-white border-2 border-black focus-within:border-[#4571A1] focus-within:ring-2 focus-within:ring-[#4571A1]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
-              <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#4571A1] transition-colors" />
+            <div className="relative flex items-center bg-white border border-slate-200 hover:border-slate-300 focus-within:border-[#0B53FA] focus-within:ring-4 focus-within:ring-[#0B53FA]/10 rounded-xl px-4 py-3 transition-all duration-200 group shadow-sm">
+              <Lock className="w-4.5 h-4.5 text-slate-400 shrink-0 mr-3 group-focus-within:text-[#0B53FA] transition-colors" />
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 required
                 placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                className={`bg-transparent border-none text-sm text-slate-800 placeholder-slate-300 w-full focus:outline-none font-medium ${!showConfirmPassword ? 'tracking-widest' : ''}`}
+                className={`bg-transparent border-none text-sm text-slate-800 placeholder:text-slate-400 w-full focus:outline-none font-medium ${!showConfirmPassword ? 'tracking-widest' : ''}`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="text-slate-400 hover:text-[#4571A1] focus:outline-none ml-2 shrink-0 cursor-pointer"
+                className="text-slate-400 hover:text-[#0B53FA] focus:outline-none ml-2 shrink-0 cursor-pointer"
               >
                 {showConfirmPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
               </button>
@@ -276,10 +299,10 @@ export default function Signup({ onToggleView }) {
             variants={itemVariants}
             type="submit"
             disabled={loading}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             style={{ color: '#ffffff' }}
-            className="w-full py-3.5 mt-2 bg-[#4571A1] hover:bg-[#395F8A] text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:bg-slate-100 disabled:text-slate-400"
+            className="w-full py-3.5 mt-2 bg-[#0B53FA] hover:bg-[#0944CD] text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-[#0B53FA]/20 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400"
           >
             {loading ? (
               <Loader className="w-4 h-4 animate-spin" />
@@ -318,7 +341,7 @@ export default function Signup({ onToggleView }) {
         {/* Footer Account Prompt */}
         <motion.div variants={itemVariants} className="text-center text-xs font-semibold text-slate-500">
           <span>Already have an account?</span>{' '}
-          <button onClick={onToggleView} className="text-[#4571A1] hover:text-[#395F8A] font-bold transition-colors cursor-pointer ml-1">
+          <button onClick={onToggleView} className="text-[#0B53FA] hover:text-[#0944CD] font-bold transition-colors cursor-pointer ml-1">
             Sign In Instead
           </button>
         </motion.div>
@@ -347,13 +370,13 @@ export default function Signup({ onToggleView }) {
 
               {!GOOGLE_CLIENT_ID && (
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-3 text-xs text-slate-600">
-                  <p className="font-bold text-[#4571A1]">Setup Instructions:</p>
+                  <p className="font-bold text-[#0B53FA]">Setup Instructions:</p>
                   <ol className="list-decimal list-inside space-y-2 leading-relaxed">
-                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-[#4571A1] hover:underline">Google Cloud</a>.</li>
+                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-[#0B53FA] hover:underline">Google Cloud</a>.</li>
                     <li>Create <strong>OAuth Client ID</strong> for a Web Application.</li>
-                    <li>Add <code className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 text-[#4571A1]">http://localhost:3000</code> to origins.</li>
-                    <li>Update your <code className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 text-[#4571A1]">.env</code>:
-                      <pre className="bg-slate-100 p-3 rounded-xl mt-2 text-[#4571A1] font-mono text-[10px] overflow-x-auto border border-slate-200">VITE_GOOGLE_CLIENT_ID=your_client_id</pre>
+                    <li>Add <code className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 text-[#0B53FA]">http://localhost:3000</code> to origins.</li>
+                    <li>Update your <code className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 text-[#0B53FA]">.env</code>:
+                      <pre className="bg-slate-100 p-3 rounded-xl mt-2 text-[#0B53FA] font-mono text-[10px] overflow-x-auto border border-slate-200">VITE_GOOGLE_CLIENT_ID=your_client_id</pre>
                     </li>
                   </ol>
                 </div>

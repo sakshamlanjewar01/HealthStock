@@ -1,0 +1,4 @@
+# HealthStock robots.txt for production deployment
+User-agent: *
+Allow: /
+Disallow: /api/

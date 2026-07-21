@@ -59,7 +59,7 @@ export default function RefillReminder({ refills, medicines = [], onRefill, acti
                   ) : (
                     <button
                       onClick={() => onRefill(refill.medicineId)}
-                      className="px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white border border-[#2563EB] text-xs font-semibold rounded-lg transition-all cursor-pointer"
+                      className="px-3 py-1.5 bg-[#0B53FA] hover:bg-[#0944CD] text-white border border-[#0B53FA] text-xs font-bold rounded-lg transition-all cursor-pointer shadow-sm shadow-[#0B53FA]/10"
                     >
                       Refill
                     </button>
@@ -91,13 +91,13 @@ export default function RefillReminder({ refills, medicines = [], onRefill, acti
   const totalDailyUnits = medicines.length > 0 ? medicines[0].unit : 'Tablets';
 
   return (
-    <div className="space-y-6 text-left max-w-md mx-auto md:max-w-none">
+    <div className="space-y-6 text-left max-w-md mx-auto md:max-w-none pt-4 pb-12">
 
       {/* Page Header Area with Hero Leaf & Pill Bottle SVG */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mt-2 mb-8 relative">
+      <div className="bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 relative">
         <div className="flex-1">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-[#061D4C] tracking-tight">Refills Management</h1>
-          <p className="text-sm text-[#64748B] mt-2 max-w-lg">Track low stocks, estimate remaining supply days, and request prescription refills with our intelligent monitoring system.</p>
+          <h1 className="text-3xl font-extrabold text-[#0F2F57] tracking-tight">Refills Management</h1>
+          <p className="text-sm text-[#4B6B8B] font-medium mt-1">Track low stocks, estimate remaining supply days, and request prescription refills with our intelligent monitoring system.</p>
         </div>
         <div className="hidden md:block shrink-0 w-48 h-32 relative">
           <svg width="180" height="120" viewBox="0 0 180 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute -right-4 -top-8">

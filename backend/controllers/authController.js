@@ -408,12 +408,12 @@ If you did not request this, please ignore this email and your password will rem
     try {
       await sendMail({
         to: user.email,
-        subject: 'Trulicare Password Reset Request',
+        subject: 'Healthstock Password Reset Request',
         text: message,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
             <h2 style="color: #0F2F57;">Password Reset Request</h2>
-            <p>You requested a password reset for your Trulicare account.</p>
+            <p>You requested a password reset for your Healthstock account.</p>
             <p>Please click the button below to reset your password. This link is valid for 1 hour:</p>
             <div style="margin: 24px 0;">
               <a href="${resetUrl}" style="background-color: #4571A1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reset Password</a>

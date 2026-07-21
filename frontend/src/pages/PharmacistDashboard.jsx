@@ -68,8 +68,8 @@ export default function PharmacistDashboard() {
             <Package className="w-6 h-6 text-teal-400" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pharmacist Dashboard</h1>
-            <p className="text-xs text-slate-400 font-medium">Manage and fulfill patient prescription requests</p>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Pharmacist Dashboard</h1>
+            <p className="text-sm text-slate-400 font-medium mt-1">Manage and fulfill patient prescription requests</p>
           </div>
         </div>
         <button

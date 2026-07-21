@@ -19,10 +19,6 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
     return `${y}-${m}-${d}`;
   };
 
-  const handleExportCalendar = () => {
-    window.open(`${API_URL}/data/calendar/export`, '_blank');
-  };
-
   const renderPillIcon = (shape, color) => {
     const colorMap = {
       Red: '#EF4444',
@@ -227,37 +223,30 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
   return (
     <div className="flex flex-col lg:flex-row gap-6 text-left animate-fadeIn">
       {/* Monthly Grid Section */}
-      <div className="flex-1 bg-white rounded-[2rem] border border-slate-100 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between">
+      <div className="flex-1 bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between">
         
         {/* Month Selector Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-blue-50 text-[#2563EB] rounded-2xl flex items-center justify-center shrink-0">
-              <CalendarIcon className="w-5 h-5 text-[#2563EB]" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 bg-slate-50/50 rounded-2xl border border-slate-100 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#0B53FA]/10 text-[#0B53FA] rounded-2xl flex items-center justify-center shrink-0">
+              <CalendarIcon className="w-5 h-5 text-[#0B53FA]" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-[#061D4C] tracking-tight">{MONTHS[month]} {year}</h3>
+              <h3 className="text-lg font-extrabold text-[#0F2F57] tracking-tight">{MONTHS[month]} {year}</h3>
               <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Medication schedule calendar</p>
             </div>
           </div>
           <div className="flex gap-2 items-center justify-between sm:justify-end w-full sm:w-auto">
-            <button
-              onClick={handleExportCalendar}
-              className="px-3.5 py-2 border border-[#DBEAFE] bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white font-extrabold text-[10px] rounded-xl tracking-wide uppercase transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-              title="Download calendar .ics file"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Sync Calendar
-            </button>
             <div className="flex gap-2 items-center shrink-0">
               <button
                 onClick={handlePrevMonth}
-                className="w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition-all cursor-pointer shadow-sm"
               >
                 <ChevronLeft className="w-4 h-4 text-slate-500" />
               </button>
               <button
                 onClick={handleNextMonth}
-                className="w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition-all cursor-pointer shadow-sm"
               >
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </button>
@@ -284,16 +273,16 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
                 onClick={() => setSelectedDate(slot.date)}
                 className={`min-h-[85px] p-1.5 rounded-2xl flex flex-col justify-between border text-left transition-all active:scale-95 cursor-pointer relative ${
                   isSelected
-                    ? 'border-[#2563EB] bg-blue-50/50 shadow-sm shadow-blue-500/5'
+                    ? 'border-[#0B53FA] bg-[#0B53FA]/5 shadow-sm shadow-[#0B53FA]/10'
                     : isToday
-                    ? 'border-[#3B82F6] bg-slate-50'
+                    ? 'border-[#0B53FA]/50 bg-slate-50'
                     : 'border-slate-100 hover:border-slate-200 bg-white'
                 } ${!isCurrentMonth && 'opacity-40'}`}
               >
                 <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-1">
                     <span className={`text-xs font-black px-1.5 py-0.5 rounded-lg ${
-                      isToday ? 'bg-[#2563EB] text-white' : 'text-[#061D4C]'
+                      isToday ? 'bg-[#0B53FA] text-white' : 'text-[#0F2F57]'
                     }`}>{slot.day}</span>
                     
                     {/* Compliance Indicator Dot */}
@@ -308,7 +297,7 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
                     )}
                   </div>
                   {scheduled.length > 0 && (
-                    <span className="text-[9px] font-extrabold text-[#2563EB] bg-blue-50 px-1 rounded-md">{scheduled.length} meds</span>
+                    <span className="text-[9px] font-extrabold text-[#0B53FA] bg-[#0B53FA]/10 px-1 rounded-md">{scheduled.length} meds</span>
                   )}
                 </div>
 
@@ -337,15 +326,15 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
       </div>
 
       {/* Day Schedule Panel Detail */}
-      <div className="w-full lg:w-[350px] bg-white rounded-[2rem] border border-slate-100 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col">
-        <div className="pb-4 border-b border-slate-100 flex justify-between items-center">
+      <div className="w-full lg:w-[350px] bg-white rounded-[2rem] border border-slate-100/80 p-6 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col">
+        <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex justify-between items-center mb-4">
           <div>
-            <h4 className="text-sm font-black text-[#061D4C] uppercase tracking-wider">Day Schedule</h4>
-            <p className="text-xs text-[#2563EB] font-bold mt-1">{formatSelectedDate()}</p>
+            <h4 className="text-sm font-black text-[#0F2F57] uppercase tracking-wider">Day Schedule</h4>
+            <p className="text-xs text-[#0B53FA] font-bold mt-1">{formatSelectedDate()}</p>
           </div>
           {/* Header Badge */}
           {isSelectedToday && (
-            <span className="bg-blue-100 text-[#2563EB] text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Today</span>
+            <span className="bg-[#0B53FA]/10 text-[#0B53FA] text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Today</span>
           )}
           {isSelectedPast && (
             <span className="bg-slate-100 text-slate-500 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">History</span>
@@ -356,6 +345,49 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-5 py-4 max-h-[480px]">
+          {/* Historical Intake Summary Banner for Past Dates */}
+          {isSelectedPast && scheduledMedsForSelectedDay.length > 0 && (
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-left space-y-2">
+              {(() => {
+                let totalSlots = 0, taken = 0, skipped = 0, missed = 0;
+                scheduledMedsForSelectedDay.forEach(med => {
+                  const times = (med.timeOfDay || 'Morning').split(/[,;&]|\band\b/i).map(t => t.trim()).filter(Boolean);
+                  times.forEach(t => {
+                    totalSlots++;
+                    const log = getLogForMedOnDate(med._id || med.id, t, selectedDate);
+                    if (log?.status === 'taken') taken++;
+                    else if (log?.status === 'skipped') skipped++;
+                    else missed++;
+                  });
+                });
+
+                return (
+                  <>
+                    <div className="flex justify-between items-center text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                      <span>Daily Compliance Summary</span>
+                      <span>{totalSlots} Scheduled</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-lg">
+                        {taken} Taken
+                      </span>
+                      {skipped > 0 && (
+                        <span className="bg-amber-50 text-amber-700 border border-amber-100 text-[10px] font-bold px-2 py-0.5 rounded-lg">
+                          {skipped} Skipped
+                        </span>
+                      )}
+                      {missed > 0 && (
+                        <span className="bg-rose-50 text-rose-700 border border-rose-100 text-[10px] font-bold px-2 py-0.5 rounded-lg">
+                          {missed} Missed
+                        </span>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
           {scheduledMedsForSelectedDay.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400 space-y-2">
               <Clock className="w-8 h-8 text-slate-300" />
@@ -453,32 +485,41 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
 
                             {/* CASE 2: PAST DATES - Read-Only History */}
                             {isSelectedPast && (
-                              <>
+                              <div className="flex items-center gap-1">
                                 {log ? (
-                                  <div className="flex items-center">
+                                  <>
                                     {log.status === 'taken' && (
-                                      <span className="text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 select-none">
+                                      <span className="text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                                         <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Taken
                                       </span>
                                     )}
                                     {log.status === 'skipped' && (
-                                      <span className="text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 select-none">
+                                      <span className="text-amber-600 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                                         <AlertCircle className="w-3.5 h-3.5 text-amber-500" /> Skipped
                                       </span>
                                     )}
                                     {log.status === 'missed' && (
-                                      <span className="text-rose-600 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 select-none">
+                                      <span className="text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                                         <XCircle className="w-3.5 h-3.5 text-rose-500" /> Missed
                                       </span>
                                     )}
-                                  </div>
+                                    {onLogAction && (
+                                      <button
+                                        onClick={() => onLogAction(med._id || med.id, blockName, 'undo', getLocalDateString(selectedDate))}
+                                        className="text-xs font-bold text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg cursor-pointer ml-0.5"
+                                        title="Undo log"
+                                      >
+                                        Undo
+                                      </button>
+                                    )}
+                                  </>
                                 ) : (
-                                  /* If no log recorded, it is marked as unlogged history (read-only missed) */
-                                  <span className="text-rose-600 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 select-none">
-                                    <ShieldAlert className="w-3.5 h-3.5 text-rose-500" /> Unlogged
+                                  /* Unlogged past dose defaults to Missed status */
+                                  <span className="text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                    <XCircle className="w-3.5 h-3.5 text-rose-500" /> Missed
                                   </span>
                                 )}
-                              </>
+                              </div>
                             )}
 
                             {/* CASE 3: FUTURE DATES - Read-Only Scheduled Upcoming */}
@@ -504,7 +545,7 @@ export default function MedicationCalendar({ medicines = [], logs = [], onLogAct
           <Info className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
           <span>
             {isSelectedToday && "Doses for today can be logged as Taken or Skipped in real-time."}
-            {isSelectedPast && "This is a historical day. Compliance logs are locked and cannot be edited."}
+            {isSelectedPast && "Viewing past date history. You can review intake status or retroactively log missed doses."}
             {isSelectedFuture && "These are future upcoming intakes. Logging will become active on this date."}
           </span>
         </div>

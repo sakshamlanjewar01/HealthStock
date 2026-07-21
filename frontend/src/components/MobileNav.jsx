@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function MobileNav({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Activity },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'inventory', label: 'Meds', icon: Package },
     { id: 'refills', label: 'Refills', icon: RefreshCw },
     { id: 'progress', label: 'Progress', icon: HeartPulse },
+    { id: 'calendar', label: 'History', icon: Calendar },
     { id: 'alerts', label: 'Alerts', icon: Bell, hasDot: true }
   ];
 
