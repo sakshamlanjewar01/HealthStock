@@ -127,7 +127,7 @@ app.use('/api/auth/signup', authLimiter);
 // Database connection
 const connectDB = async () => {
   try {
-    const connStr = process.env.MONGODB_URI || 'mongodb://localhost:27017/healthstock';
+    const connStr = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/healthstock';
     await mongoose.connect(connStr, {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
