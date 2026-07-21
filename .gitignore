@@ -1,0 +1,48 @@
+# ─── Dependencies ─────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build outputs ────────────────────────────────────────────
+dist/
+build/
+.vite/
+*.mjs.timestamp-*
+
+# ─── Environment / Secrets (NEVER COMMIT THESE) ───────────────
+.env
+.env.local
+.env.production
+.env.staging
+.env*.local
+
+# ─── Logs ─────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+email-logs.txt
+pharmacy-dispatches.txt
+
+# ─── OS files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor / IDE ─────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Debug / scratch scripts (should be in scripts/ not root) ──
+backend/scratch_query.js
+backend/test_api.js
+backend/test_security.js
+backend/update_db.js
+
+# ─── Vite timestamp artifact ──────────────────────────────────
+vite.config.js.timestamp-*.mjs
